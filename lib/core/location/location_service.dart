@@ -15,28 +15,32 @@ class LocationResult {
 
 class LocationService {
   static Future<LocationResult?> getCurrentLocation() async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) return null;
+    try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) return null;
 
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) return null;
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) return null;
+      }
+
+      if (permission == LocationPermission.deniedForever) return null;
+
+      final position = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(accuracy: LocationAccuracy.low),
+      ).timeout(const Duration(seconds: 10));
+
+      final name = await _reverseGeocode(position.latitude, position.longitude);
+
+      return LocationResult(
+        latitude: position.latitude,
+        longitude: position.longitude,
+        name: name,
+      );
+    } catch (_) {
+      return null;
     }
-
-    if (permission == LocationPermission.deniedForever) return null;
-
-    final position = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.low,
-    );
-
-    final name = await _reverseGeocode(position.latitude, position.longitude);
-
-    return LocationResult(
-      latitude: position.latitude,
-      longitude: position.longitude,
-      name: name,
-    );
   }
 
   static Future<LocationResult?> searchCity(String query) async {
