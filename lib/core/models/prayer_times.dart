@@ -1,0 +1,85 @@
+class PrayerTimeEntry {
+  final String name;
+  final String time;
+  final bool isCombined;
+
+  const PrayerTimeEntry({
+    required this.name,
+    required this.time,
+    this.isCombined = false,
+  });
+}
+
+class PrayerTimes {
+  final String fajr;
+  final String sunrise;
+  final String dhuhr;
+  final String asr;
+  final String maghrib;
+  final String isha;
+  final DateTime date;
+
+  const PrayerTimes({
+    required this.fajr,
+    required this.sunrise,
+    required this.dhuhr,
+    required this.asr,
+    required this.maghrib,
+    required this.isha,
+    required this.date,
+  });
+
+  factory PrayerTimes.fromAlAdhanJson(Map<String, dynamic> json, DateTime date) {
+    return PrayerTimes(
+      fajr: json['Fajr'] as String,
+      sunrise: json['Sunrise'] as String,
+      dhuhr: json['Dhuhr'] as String,
+      asr: json['Asr'] as String,
+      maghrib: json['Maghrib'] as String,
+      isha: json['Isha'] as String,
+      date: date,
+    );
+  }
+
+  List<PrayerTimeEntry> toDisplayList({required bool combine}) {
+    if (combine) {
+      return [
+        PrayerTimeEntry(name: 'Fajr', time: fajr),
+        PrayerTimeEntry(name: 'Sunrise', time: sunrise),
+        PrayerTimeEntry(name: 'Dhuhr + Asr', time: '$dhuhr - $asr', isCombined: true),
+        PrayerTimeEntry(name: 'Maghrib + Isha', time: '$maghrib - $isha', isCombined: true),
+      ];
+    }
+    return [
+      PrayerTimeEntry(name: 'Fajr', time: fajr),
+      PrayerTimeEntry(name: 'Sunrise', time: sunrise),
+      PrayerTimeEntry(name: 'Dhuhr', time: dhuhr),
+      PrayerTimeEntry(name: 'Asr', time: asr),
+      PrayerTimeEntry(name: 'Maghrib', time: maghrib),
+      PrayerTimeEntry(name: 'Isha', time: isha),
+    ];
+  }
+
+  PrayerTimeEntry nextPrayer(DateTime now) {
+    final entries = [
+      PrayerTimeEntry(name: 'Fajr', time: fajr),
+      PrayerTimeEntry(name: 'Sunrise', time: sunrise),
+      PrayerTimeEntry(name: 'Dhuhr', time: dhuhr),
+      PrayerTimeEntry(name: 'Asr', time: asr),
+      PrayerTimeEntry(name: 'Maghrib', time: maghrib),
+      PrayerTimeEntry(name: 'Isha', time: isha),
+    ];
+
+    final nowMinutes = now.hour * 60 + now.minute;
+
+    for (final entry in entries) {
+      final parts = entry.time.split(':');
+      final entryMinutes = int.parse(parts[0]) * 60 + int.parse(parts[1]);
+      if (entryMinutes > nowMinutes) {
+        return entry;
+      }
+    }
+
+    return PrayerTimeEntry(name: 'Fajr', time: fajr);
+  }
+}
