@@ -67,11 +67,13 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const Spacer(flex: 1),
+              const Spacer(flex: 2),
               Text(
                 'KHUSHU',
                 style: theme.textTheme.headlineMedium,
+                textAlign: TextAlign.center,
               ),
               const SizedBox(height: 12),
               Text(
@@ -98,6 +100,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 Text(
                   'Enter your city',
                   style: theme.textTheme.bodyMedium,
+                  textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 8),
                 Row(
@@ -133,6 +136,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 Text(
                   'Which tradition do you follow?',
                   style: theme.textTheme.bodyMedium?.copyWith(fontSize: 14),
+                  textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 16),
                 _TraditionButton(
@@ -156,7 +160,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   onTap: () => _selectTradition(Tradition.jafari),
                 ),
               ],
-              const Spacer(flex: 2),
+              const Spacer(flex: 3),
             ],
           ),
         ),
