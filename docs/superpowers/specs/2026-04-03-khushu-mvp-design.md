@@ -8,7 +8,7 @@ Khushu (خشوع) is a cross-platform Islamic prayer times app built with Flutte
 
 ## Problem
 
-Existing prayer apps in app stores serve either Sunni or Shia Muslims, reinforcing sectarian divisions. There is no single prayer app that treats all madhabs as first-class citizens.
+Most prayer apps only support Sunni or Shia calculation methods. Salaat is shared by all Muslims and we want to foster Ummatic unity by accommodating each other's prayer schedules.
 
 ## Solution
 
