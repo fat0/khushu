@@ -1,13 +1,14 @@
 # Khushu Roadmap
 
 ## MVP
-- Prayer times for all 6 madhabs (Hanafi, Maliki, Shafi'i, Hanbali, Jafari, Zaidi)
-  - GPS auto-detect + manual city search for location
+- Prayer times for Sunni (Standard + Hanafi) and Shia (Jafari) traditions
+  - GPS auto-detect location + manual city search fallback
+  - Auto-detect regional calculation method from user's location
   - API-only prayer times (AlAdhan API) with daily caching
   - Main screen: current/next prayer with countdown, all prayer times for the day, current date, location name
-  - Jafari: 3 combined time windows (Dhuhr+Asr, Maghrib+Isha)
-  - Zaidi: user choice between combined or separate display
-  - Onboarding: single screen with mission statement + madhab selection
+  - "Combine prayers" toggle available to all traditions (Sunni travelers, Jafari daily)
+  - Onboarding: single screen — mission statement + one question (Sunni Standard / Sunni Hanafi / Shia Jafari)
+  - Settings: override calculation method (full list for power users)
   - Light and dark mode
 
 ## Design Decisions
@@ -17,7 +18,8 @@
 - **Typography:** Light weight, generous spacing
 - **Header motif:** Line art half-circle dome + tilted crescent moon (open right) + two simple minarets (parallel lines, pointed tops, open bottom) — all in single-weight outline style
 - **Mission statement:** "One Ummah Serving Allah"
-- **Onboarding:** Single screen — mission statement at top, flat list of 6 madhabs below
+- **Onboarding:** Single screen — mission statement + one question: Sunni Standard / Sunni Hanafi / Shia Jafari
+- **API approach:** AlAdhan API with two key params — `method` (auto-detected by region) and `school` (0=standard, 1=Hanafi)
 
 ## Future Features
 1. Adhan alerts with audio playback per prayer
