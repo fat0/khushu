@@ -27,9 +27,21 @@ class LocationService {
 
       if (permission == LocationPermission.deniedForever) return null;
 
+      // Try last known position first (instant)
+      final lastKnown = await Geolocator.getLastKnownPosition();
+      if (lastKnown != null) {
+        final name = await _reverseGeocode(lastKnown.latitude, lastKnown.longitude);
+        return LocationResult(
+          latitude: lastKnown.latitude,
+          longitude: lastKnown.longitude,
+          name: name,
+        );
+      }
+
+      // Fall back to current position with timeout
       final position = await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(accuracy: LocationAccuracy.low),
-      ).timeout(const Duration(seconds: 10));
+      ).timeout(const Duration(seconds: 15));
 
       final name = await _reverseGeocode(position.latitude, position.longitude);
 
