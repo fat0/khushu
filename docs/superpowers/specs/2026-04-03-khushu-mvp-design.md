@@ -2,7 +2,7 @@
 
 ## Overview
 
-Khushu (خشوع) is a cross-platform Islamic prayer times app built with Flutter. It supports all 6 major madhabs — Hanafi, Maliki, Shafi'i, Hanbali (Sunni) and Jafari, Zaidi (Shia) — promoting unity across the Ummah.
+Khushu (خشوع) is a cross-platform Islamic prayer times app built with Flutter. It supports Sunni and Shia prayer time calculations — promoting unity across the Ummah.
 
 **Mission:** One Ummah Serving Allah
 
@@ -12,7 +12,7 @@ Existing prayer apps in app stores serve either Sunni or Shia Muslims, reinforci
 
 ## Solution
 
-A free, ad-free, open source prayer app that provides accurate prayer times for all 6 madhabs from a single, calm, welcoming interface. No sect is labeled or grouped — users simply pick their madhab by name.
+A free, ad-free, open source prayer app that provides accurate prayer times for both Sunni and Shia traditions from a single, calm, welcoming interface. The app auto-detects the best regional calculation method and asks one simple question about the user's prayer tradition.
 
 ## MVP Scope
 
@@ -22,36 +22,58 @@ The MVP is focused exclusively on prayer times. All other features are deferred 
 
 **1. Onboarding (single screen)**
 - "One Ummah Serving Allah" mission statement at top
-- Flat list of 6 madhabs below: Hanafi, Maliki, Shafi'i, Hanbali, Jafari, Zaidi
-- No Sunni/Shia grouping — all presented equally
-- Selecting a madhab triggers GPS location permission prompt, then navigates to prayer times
-- If GPS is denied, falls back to manual city search
+- GPS location permission prompt — auto-detects regional calculation method
+- If GPS denied, falls back to manual city search
+- One simple question: "Which tradition do you follow?"
+  - Sunni (Standard Asr)
+  - Sunni (Hanafi Asr)
+  - Shia (Jafari)
+- Selection maps to API parameters:
+  - Sunni Standard → regional method (auto-detected) + `school=0`
+  - Sunni Hanafi → regional method (auto-detected) + `school=1`
+  - Shia Jafari → `method=0` (Qum) + `school=0`
+- Navigates straight to prayer times
+
+**Regional method auto-detection:**
+| User's region | AlAdhan method |
+|---------------|----------------|
+| North America | ISNA (2) |
+| Europe | MWL (3) |
+| Saudi Arabia | Umm Al-Qura (4) |
+| Egypt / Africa | Egyptian (5) |
+| Pakistan / India | Karachi (1) |
+| Gulf states | Gulf (8) |
+| Turkey | Turkey (13) |
+| SE Asia | JAKIM (17) / Kemenag (20) |
+| Iran (Shia) | Tehran (7) |
+| Default | MWL (3) |
 
 **2. Prayer Times (main screen)**
 - Header: line art dome motif with app name, location, and date inside
 - Next prayer card: prayer name + countdown timer
-- Prayer times list for the day:
-  - Sunni madhabs + Zaidi (default): Fajr, Sunrise, Dhuhr, Asr, Maghrib, Isha (6 rows)
-  - Jafari: Fajr, Sunrise, Dhuhr+Asr (combined), Maghrib+Isha (combined) (4 rows)
-  - Zaidi: user can toggle between combined and separate display
+- Prayer times list: Fajr, Sunrise, Dhuhr, Asr, Maghrib, Isha (always 6 rows for all traditions)
+- "Combine prayers" toggle — available to all users (Sunni travelers, Jafari daily practice)
+  - When enabled, Dhuhr+Asr shown as one combined row, Maghrib+Isha as one combined row
 - Current/next prayer highlighted with accent bar
 - Current date displayed
 - Location name displayed
 
 **3. Settings**
-- Change madhab (flat list of 6)
+- Change tradition (Sunni Standard / Sunni Hanafi / Shia Jafari)
+- Override calculation method (full list of all 20+ methods for power users)
 - Change location (GPS auto-detect or manual city search)
+- Toggle combine prayers
 - Toggle light/dark mode
-- Zaidi users: toggle combined/separate prayer display
 
 ### Data Flow
 
-1. User selects madhab during onboarding → stored in Hive
-2. App requests GPS location → coordinates stored in Hive
-3. App fetches prayer times from AlAdhan API using madhab + coordinates
-4. Prayer times cached in Hive for the day
-5. On next app open, cached times displayed immediately
-6. Cache refreshed daily or when location/madhab changes
+1. App requests GPS location → coordinates stored in Hive
+2. App auto-detects regional calculation method from coordinates
+3. User selects tradition (Sunni Standard / Sunni Hanafi / Shia Jafari) → stored in Hive
+4. App fetches prayer times from AlAdhan API using method + school + coordinates
+5. Prayer times cached in Hive for the day
+6. On next app open, cached times displayed immediately
+7. Cache refreshed daily or when location/tradition changes
 
 ## Architecture
 
@@ -64,13 +86,13 @@ The MVP is focused exclusively on prayer times. All other features are deferred 
 
 ### Local Storage
 - **Hive** — lightweight, pure-Dart NoSQL database for:
-  - User settings (madhab, location, theme preference)
+  - User settings (tradition, calculation method, location, theme, combine prayers)
   - Cached prayer times (daily)
 
 ### Prayer Times Source (MVP)
 - **AlAdhan API** — free, trusted Islamic prayer times API
   - Endpoint: `https://api.aladhan.com/v1/timings`
-  - Supports all 6 madhabs via calculation method parameters
+  - Two key parameters: `method` (0-23, calculation angles) and `school` (0=standard, 1=Hanafi Asr)
   - Cached daily — only needs internet once per day
 
 ### Project Structure
@@ -141,7 +163,7 @@ lib/
 ## Risks
 
 - **AlAdhan API downtime:** Mitigated by daily caching — app only needs API once per day. Offline calculation (adhan-dart) is on the roadmap.
-- **Jafari/Zaidi accuracy:** AlAdhan API supports Jafari (method 0/7) and general Shia methods. Zaidi may need custom parameters — will validate against known correct times during development.
+- **Jafari accuracy:** AlAdhan API supports two Shia methods — Qum (method 0) and Tehran (method 7). Tehran available as override in settings for users who prefer it.
 - **GPS permission denied:** Falls back to manual city entry. App remains fully functional.
 
 ## Out of Scope (Future Roadmap)
