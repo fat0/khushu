@@ -67,42 +67,58 @@ test/
 **Files:**
 - Create: entire Flutter project scaffold
 
-- [ ] **Step 0.1: Install Flutter SDK**
-
-If Flutter is not installed, install via Homebrew:
+- [ ] **Step 0.1: Install FVM (Flutter Version Management)**
 
 ```bash
-brew install --cask flutter
+brew install fvm
 ```
 
-After install, verify:
-
-```bash
-flutter --version
-flutter doctor
-```
-
-Expected: Flutter 3.x.x installed, Dart SDK included. Warnings about Xcode/Android Studio are OK for now.
-
-- [ ] **Step 0.2: Create Flutter project**
+- [ ] **Step 0.2: Install Flutter via FVM and pin to project**
 
 ```bash
 cd /Users/fatima/git/khushu
-flutter create . --org com.khushu --project-name khushu --platforms android,ios
+fvm install 3.24.0
+fvm use 3.24.0
+```
+
+This creates a `.fvmrc` file in the project root (commit this) and downloads Flutter 3.24.0 into FVM's cache — not globally.
+
+Add FVM's local symlink to `.gitignore`:
+
+```bash
+echo ".fvm/" >> .gitignore
+```
+
+Verify:
+
+```bash
+fvm flutter --version
+fvm flutter doctor
+```
+
+Expected: Flutter 3.24.0 installed, Dart SDK included. Warnings about Xcode/Android Studio are OK for now.
+
+**Note:** All `flutter` commands in this plan should be run as `fvm flutter` to use the project-pinned version.
+
+- [ ] **Step 0.3: Create Flutter project**
+
+```bash
+cd /Users/fatima/git/khushu
+fvm flutter create . --org com.khushu --project-name khushu --platforms android,ios
 ```
 
 This creates the Flutter project in the existing repo directory.
 
-- [ ] **Step 0.3: Verify the app builds**
+- [ ] **Step 0.4: Verify the app builds**
 
 ```bash
-flutter pub get
-flutter analyze
+fvm fvm flutter pub get
+fvm fvm flutter analyze
 ```
 
 Expected: No errors. Warnings are OK.
 
-- [ ] **Step 0.4: Add dependencies to pubspec.yaml**
+- [ ] **Step 0.5: Add dependencies to pubspec.yaml**
 
 Replace the `dependencies` and `dev_dependencies` sections in `pubspec.yaml`:
 
@@ -136,12 +152,12 @@ dev_dependencies:
 Then run:
 
 ```bash
-flutter pub get
+fvm flutter pub get
 ```
 
 Expected: All packages resolve successfully.
 
-- [ ] **Step 0.5: Create directory structure**
+- [ ] **Step 0.6: Create directory structure**
 
 ```bash
 mkdir -p lib/core/theme lib/core/storage lib/core/api lib/core/location lib/core/models
@@ -151,7 +167,7 @@ mkdir -p test/core/api test/core/location test/core/models
 mkdir -p test/features/prayer_times
 ```
 
-- [ ] **Step 0.6: Commit**
+- [ ] **Step 0.7: Commit**
 
 ```bash
 git add -A
@@ -406,7 +422,7 @@ void main() {
 - [ ] **Step 2.2: Run test to verify it fails**
 
 ```bash
-flutter test test/core/models/prayer_times_test.dart
+fvm flutter test test/core/models/prayer_times_test.dart
 ```
 
 Expected: FAIL — `prayer_times.dart` doesn't exist.
@@ -507,7 +523,7 @@ class PrayerTimes {
 - [ ] **Step 2.4: Run test to verify it passes**
 
 ```bash
-flutter test test/core/models/prayer_times_test.dart
+fvm flutter test test/core/models/prayer_times_test.dart
 ```
 
 Expected: All 5 tests PASS.
@@ -560,7 +576,7 @@ void main() {
 - [ ] **Step 2.6: Run test to verify it fails**
 
 ```bash
-flutter test test/core/models/user_settings_test.dart
+fvm flutter test test/core/models/user_settings_test.dart
 ```
 
 Expected: FAIL — `user_settings.dart` doesn't exist.
@@ -655,7 +671,7 @@ class UserSettings {
 - [ ] **Step 2.8: Run test to verify it passes**
 
 ```bash
-flutter test test/core/models/user_settings_test.dart
+fvm flutter test test/core/models/user_settings_test.dart
 ```
 
 Expected: All 3 tests PASS.
@@ -731,7 +747,7 @@ void main() {
 - [ ] **Step 3.2: Run test to verify it fails**
 
 ```bash
-flutter test test/core/location/region_detector_test.dart
+fvm flutter test test/core/location/region_detector_test.dart
 ```
 
 Expected: FAIL — `region_detector.dart` doesn't exist.
@@ -796,7 +812,7 @@ class RegionDetector {
 - [ ] **Step 3.4: Run test to verify it passes**
 
 ```bash
-flutter test test/core/location/region_detector_test.dart
+fvm flutter test test/core/location/region_detector_test.dart
 ```
 
 Expected: All 8 tests PASS.
@@ -951,7 +967,7 @@ void main() {
 - [ ] **Step 5.2: Run test to verify it fails**
 
 ```bash
-flutter test test/core/api/aladhan_api_test.dart
+fvm flutter test test/core/api/aladhan_api_test.dart
 ```
 
 Expected: FAIL — `aladhan_api.dart` doesn't exist.
@@ -1016,7 +1032,7 @@ class AlAdhanApi {
 - [ ] **Step 5.4: Run test to verify it passes**
 
 ```bash
-flutter test test/core/api/aladhan_api_test.dart
+fvm flutter test test/core/api/aladhan_api_test.dart
 ```
 
 Expected: All 2 tests PASS.
@@ -2527,7 +2543,7 @@ class KhushuApp extends ConsumerWidget {
 - [ ] **Step 14.2: Run the app**
 
 ```bash
-flutter run
+fvm flutter run
 ```
 
 Expected: App launches. Shows onboarding screen with "KHUSHU" and "One Ummah Serving Allah", requests location, then shows tradition picker. After selection, navigates to prayer times screen.
@@ -2546,7 +2562,7 @@ git commit -m "feat: wire up main.dart with theme, routing, and Hive init"
 - [ ] **Step 15.1: Run full test suite**
 
 ```bash
-flutter test
+fvm flutter test
 ```
 
 Expected: All tests pass (PrayerTimes model, UserSettings model, RegionDetector, AlAdhan API parsing).
@@ -2554,7 +2570,7 @@ Expected: All tests pass (PrayerTimes model, UserSettings model, RegionDetector,
 - [ ] **Step 15.2: Run analyzer**
 
 ```bash
-flutter analyze
+fvm flutter analyze
 ```
 
 Expected: No errors. Fix any warnings.
