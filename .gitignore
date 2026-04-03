@@ -1,1 +1,7 @@
 .superpowers/
+.fvm/
+.dart_tool/
+.idea/
+.flutter-plugins
+.flutter-plugins-dependencies
+*.iml
