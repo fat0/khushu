@@ -4,7 +4,7 @@ import 'package:khushu/core/models/user_settings.dart';
 void main() {
   group('UserSettings', () {
     test('default values are correct', () {
-      final settings = UserSettings();
+      const settings = UserSettings();
 
       expect(settings.tradition, Tradition.sunniStandard);
       expect(settings.methodId, isNull);
@@ -17,21 +17,21 @@ void main() {
     });
 
     test('apiSchool returns 1 for Hanafi, 0 otherwise', () {
-      final hanafi = UserSettings(tradition: Tradition.sunniHanafi);
+      const hanafi = UserSettings(tradition: Tradition.sunniHanafi);
       expect(hanafi.apiSchool, 1);
 
-      final standard = UserSettings(tradition: Tradition.sunniStandard);
+      const standard = UserSettings(tradition: Tradition.sunniStandard);
       expect(standard.apiSchool, 0);
 
-      final jafari = UserSettings(tradition: Tradition.jafari);
+      const jafari = UserSettings(tradition: Tradition.jafari);
       expect(jafari.apiSchool, 0);
     });
 
     test('apiMethod returns 0 for Jafari, methodId for Sunni', () {
-      final jafari = UserSettings(tradition: Tradition.jafari, methodId: 2);
+      const jafari = UserSettings(tradition: Tradition.jafari, methodId: 2);
       expect(jafari.apiMethod, 0);
 
-      final sunni = UserSettings(tradition: Tradition.sunniStandard, methodId: 2);
+      const sunni = UserSettings(tradition: Tradition.sunniStandard, methodId: 2);
       expect(sunni.apiMethod, 2);
     });
   });
