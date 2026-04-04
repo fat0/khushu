@@ -64,12 +64,14 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
     return Scaffold(
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const Spacer(flex: 2),
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
               Text(
                 'KHUSHU',
                 style: theme.textTheme.headlineMedium,
@@ -160,9 +162,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   onTap: () => _selectTradition(Tradition.jafari),
                 ),
               ],
-              const Spacer(flex: 3),
             ],
           ),
+        ),
         ),
       ),
     );
