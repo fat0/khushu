@@ -5,8 +5,8 @@ import '../../core/storage/hive_service.dart';
 class SettingsNotifier extends StateNotifier<UserSettings> {
   SettingsNotifier() : super(HiveService.loadSettings());
 
-  Future<void> setTradition(Tradition tradition) async {
-    state = state.copyWith(tradition: tradition);
+  Future<void> setFiqh(Fiqh fiqh) async {
+    state = state.copyWith(fiqh: fiqh);
     await HiveService.saveSettings(state);
   }
 

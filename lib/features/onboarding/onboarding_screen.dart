@@ -56,10 +56,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     }
   }
 
-  Future<void> _selectTradition(Tradition tradition) async {
+  Future<void> _selectFiqh(Fiqh fiqh) async {
     if (_locationName == null) return;
     final controller = ref.read(onboardingProvider);
-    await controller.selectTradition(tradition);
+    await controller.selectFiqh(fiqh);
     if (mounted) context.go('/prayer-times');
   }
 
@@ -143,35 +143,35 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
               const SizedBox(height: 32),
 
-              // Tradition selection — always visible
+              // Fiqh selection — always visible
               Text(
-                'Which tradition do you follow?',
+                'Which fiqh do you follow?',
                 style: theme.textTheme.bodyMedium?.copyWith(fontSize: 14),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 16),
-              _TraditionButton(
+              _FiqhButton(
                 label: 'Sunni (Standard Asr)',
                 subtitle: 'Maliki, Shafi\'i, Hanbali',
                 isDark: isDark,
                 enabled: _locationName != null,
-                onTap: () => _selectTradition(Tradition.sunniStandard),
+                onTap: () => _selectFiqh(Fiqh.sunniStandard),
               ),
               const SizedBox(height: 10),
-              _TraditionButton(
+              _FiqhButton(
                 label: 'Sunni (Hanafi Asr)',
                 subtitle: 'Later Asr prayer time',
                 isDark: isDark,
                 enabled: _locationName != null,
-                onTap: () => _selectTradition(Tradition.sunniHanafi),
+                onTap: () => _selectFiqh(Fiqh.sunniHanafi),
               ),
               const SizedBox(height: 10),
-              _TraditionButton(
+              _FiqhButton(
                 label: 'Shia (Jafari)',
-                subtitle: 'Ithna-Ashari tradition',
+                subtitle: 'Ithna-Ashari jurisprudence',
                 isDark: isDark,
                 enabled: _locationName != null,
-                onTap: () => _selectTradition(Tradition.jafari),
+                onTap: () => _selectFiqh(Fiqh.jafari),
               ),
             ],
           ),
@@ -182,14 +182,14 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   }
 }
 
-class _TraditionButton extends StatelessWidget {
+class _FiqhButton extends StatelessWidget {
   final String label;
   final String subtitle;
   final bool isDark;
   final bool enabled;
   final VoidCallback onTap;
 
-  const _TraditionButton({
+  const _FiqhButton({
     required this.label,
     required this.subtitle,
     required this.isDark,
