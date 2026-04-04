@@ -8,11 +8,13 @@ class SettingsNotifier extends StateNotifier<UserSettings> {
   Future<void> setFiqh(Fiqh fiqh) async {
     state = state.copyWith(fiqh: fiqh);
     await HiveService.saveSettings(state);
+    await HiveService.clearPrayerCache();
   }
 
   Future<void> setMethodId(int methodId) async {
     state = state.copyWith(methodId: methodId);
     await HiveService.saveSettings(state);
+    await HiveService.clearPrayerCache();
   }
 
   Future<void> setLocation(double lat, double lng, String name) async {

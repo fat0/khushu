@@ -60,6 +60,31 @@ class PrayerTimes {
     ];
   }
 
+  /// Returns the current prayer (the most recent prayer that has started)
+  PrayerTimeEntry currentPrayer(DateTime now) {
+    // Only actual prayers, not sunrise
+    final prayers = [
+      PrayerTimeEntry(name: 'Fajr', time: fajr),
+      PrayerTimeEntry(name: 'Dhuhr', time: dhuhr),
+      PrayerTimeEntry(name: 'Asr', time: asr),
+      PrayerTimeEntry(name: 'Maghrib', time: maghrib),
+      PrayerTimeEntry(name: 'Isha', time: isha),
+    ];
+
+    final nowMinutes = now.hour * 60 + now.minute;
+    PrayerTimeEntry current = prayers.last; // default to Isha
+
+    for (final entry in prayers) {
+      final parts = entry.time.split(':');
+      final entryMinutes = int.parse(parts[0]) * 60 + int.parse(parts[1]);
+      if (entryMinutes <= nowMinutes) {
+        current = entry;
+      }
+    }
+
+    return current;
+  }
+
   PrayerTimeEntry nextPrayer(DateTime now) {
     final entries = [
       PrayerTimeEntry(name: 'Fajr', time: fajr),

@@ -129,19 +129,24 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
           const SizedBox(height: 16),
 
-          // Dark mode
-          SwitchListTile(
-            title: Text('Dark mode',
-                style: TextStyle(
-                    fontSize: 14,
-                    color: isDark ? AppColors.sage : AppColors.deepGreen)),
-            subtitle: Text('Follow system when off',
-                style: TextStyle(fontSize: 12, color: isDark ? AppColors.darkSecondary : AppColors.lightSecondary)),
-            value: settings.darkMode ?? false,
-            activeColor: AppColors.sage,
-            onChanged: (v) =>
-                ref.read(settingsProvider.notifier).setDarkMode(v ? true : null),
-          ),
+          // Theme mode
+          const _SectionHeader('Theme'),
+          const SizedBox(height: 8),
+          ...[
+            (null, 'Follow system'),
+            (false, 'Light mode'),
+            (true, 'Dark mode'),
+          ].map((entry) => RadioListTile<bool?>(
+                title: Text(entry.$2,
+                    style: TextStyle(
+                        fontSize: 14,
+                        color: isDark ? AppColors.sage : AppColors.deepGreen)),
+                value: entry.$1,
+                groupValue: settings.darkMode,
+                activeColor: AppColors.sage,
+                onChanged: (v) =>
+                    ref.read(settingsProvider.notifier).setDarkMode(v),
+              )),
 
           const SizedBox(height: 24),
 

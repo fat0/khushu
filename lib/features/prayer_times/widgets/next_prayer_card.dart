@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 
 class NextPrayerCard extends StatelessWidget {
-  final String prayerName;
+  final String currentPrayerName;
+  final String nextPrayerName;
   final Duration countdown;
 
   const NextPrayerCard({
     super.key,
-    required this.prayerName,
+    required this.currentPrayerName,
+    required this.nextPrayerName,
     required this.countdown,
   });
 
@@ -28,7 +30,7 @@ class NextPrayerCard extends StatelessWidget {
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),
-      padding: const EdgeInsets.symmetric(vertical: 24),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -37,34 +39,30 @@ class NextPrayerCard extends StatelessWidget {
         ),
         borderRadius: BorderRadius.circular(16),
       ),
-      child: Column(
+      child: Row(
         children: [
-          const Text(
-            'NEXT PRAYER',
-            style: TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 2,
-              color: AppColors.sage,
-            ),
-          ),
-          const SizedBox(height: 6),
           Text(
-            prayerName,
+            currentPrayerName,
             style: const TextStyle(
-              fontSize: 32,
+              fontSize: 24,
               fontWeight: FontWeight.w300,
               color: AppColors.cream,
             ),
           ),
-          const SizedBox(height: 4),
-          Text(
-            _formatCountdown(countdown),
-            style: const TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.w500,
-              color: AppColors.sage,
-            ),
+          const Spacer(),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                '${_formatCountdown(countdown)} to $nextPrayerName',
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.sage,
+                ),
+              ),
+            ],
           ),
         ],
       ),
