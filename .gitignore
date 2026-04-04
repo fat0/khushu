@@ -5,3 +5,6 @@
 .flutter-plugins
 .flutter-plugins-dependencies
 *.iml
+build/
+android/app/.cxx/
+.gradle/
