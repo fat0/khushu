@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/models/user_settings.dart';
 import '../../core/theme/app_colors.dart';
+import '../settings/settings_provider.dart';
 import 'onboarding_provider.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
@@ -13,23 +14,26 @@ class OnboardingScreen extends ConsumerStatefulWidget {
 }
 
 class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
-  bool _locationReady = false;
-  bool _locationLoading = true;
+  String? _locationName;
+  bool _locationLoading = false;
   final _cityController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _requestLocation();
+    _tryGps();
   }
 
-  Future<void> _requestLocation() async {
+  Future<void> _tryGps() async {
+    setState(() => _locationLoading = true);
     final controller = ref.read(onboardingProvider);
     final success = await controller.setupLocation();
     if (mounted) {
       setState(() {
-        _locationReady = success;
         _locationLoading = false;
+        if (success) {
+          _locationName = ref.read(settingsProvider).locationName;
+        }
       });
     }
   }
@@ -38,14 +42,22 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     final query = _cityController.text.trim();
     if (query.isEmpty) return;
 
+    setState(() => _locationLoading = true);
     final controller = ref.read(onboardingProvider);
     final result = await controller.searchCity(query);
-    if (result != null && mounted) {
-      setState(() => _locationReady = true);
+    if (mounted) {
+      setState(() {
+        _locationLoading = false;
+        if (result != null) {
+          _locationName = result.name;
+          _cityController.clear();
+        }
+      });
     }
   }
 
   Future<void> _selectTradition(Tradition tradition) async {
+    if (_locationName == null) return;
     final controller = ref.read(onboardingProvider);
     await controller.selectTradition(tradition);
     if (mounted) context.go('/prayer-times');
@@ -86,32 +98,29 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 48),
+              const SizedBox(height: 32),
 
-              // Location status
+              // Location
               if (_locationLoading)
-                const Padding(
-                  padding: EdgeInsets.only(bottom: 24),
-                  child: SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  ),
+                const SizedBox(
+                  height: 20,
+                  width: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2),
                 )
-              else if (!_locationReady) ...[
+              else if (_locationName != null)
                 Text(
-                  'Enter your city',
-                  style: theme.textTheme.bodyMedium,
+                  _locationName!,
+                  style: theme.textTheme.bodyMedium?.copyWith(fontSize: 14),
                   textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 8),
+                )
+              else ...[
                 Row(
                   children: [
                     Expanded(
                       child: TextField(
                         controller: _cityController,
                         decoration: InputDecoration(
-                          hintText: 'e.g. London, UK',
+                          hintText: 'Enter your city...',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -130,38 +139,40 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 24),
               ],
 
-              // Tradition selection
-              if (_locationReady) ...[
-                Text(
-                  'Which tradition do you follow?',
-                  style: theme.textTheme.bodyMedium?.copyWith(fontSize: 14),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 16),
-                _TraditionButton(
-                  label: 'Sunni (Standard Asr)',
-                  subtitle: 'Maliki, Shafi\'i, Hanbali',
-                  isDark: isDark,
-                  onTap: () => _selectTradition(Tradition.sunniStandard),
-                ),
-                const SizedBox(height: 10),
-                _TraditionButton(
-                  label: 'Sunni (Hanafi Asr)',
-                  subtitle: 'Later Asr prayer time',
-                  isDark: isDark,
-                  onTap: () => _selectTradition(Tradition.sunniHanafi),
-                ),
-                const SizedBox(height: 10),
-                _TraditionButton(
-                  label: 'Shia (Jafari)',
-                  subtitle: 'Ithna-Ashari tradition',
-                  isDark: isDark,
-                  onTap: () => _selectTradition(Tradition.jafari),
-                ),
-              ],
+              const SizedBox(height: 32),
+
+              // Tradition selection — always visible
+              Text(
+                'Which tradition do you follow?',
+                style: theme.textTheme.bodyMedium?.copyWith(fontSize: 14),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              _TraditionButton(
+                label: 'Sunni (Standard Asr)',
+                subtitle: 'Maliki, Shafi\'i, Hanbali',
+                isDark: isDark,
+                enabled: _locationName != null,
+                onTap: () => _selectTradition(Tradition.sunniStandard),
+              ),
+              const SizedBox(height: 10),
+              _TraditionButton(
+                label: 'Sunni (Hanafi Asr)',
+                subtitle: 'Later Asr prayer time',
+                isDark: isDark,
+                enabled: _locationName != null,
+                onTap: () => _selectTradition(Tradition.sunniHanafi),
+              ),
+              const SizedBox(height: 10),
+              _TraditionButton(
+                label: 'Shia (Jafari)',
+                subtitle: 'Ithna-Ashari tradition',
+                isDark: isDark,
+                enabled: _locationName != null,
+                onTap: () => _selectTradition(Tradition.jafari),
+              ),
             ],
           ),
         ),
@@ -175,22 +186,27 @@ class _TraditionButton extends StatelessWidget {
   final String label;
   final String subtitle;
   final bool isDark;
+  final bool enabled;
   final VoidCallback onTap;
 
   const _TraditionButton({
     required this.label,
     required this.subtitle,
     required this.isDark,
+    this.enabled = true,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Material(
+    final opacity = enabled ? 1.0 : 0.4;
+    return Opacity(
+      opacity: opacity,
+      child: Material(
       color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
       borderRadius: BorderRadius.circular(12),
       child: InkWell(
-        onTap: onTap,
+        onTap: enabled ? onTap : null,
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -228,6 +244,7 @@ class _TraditionButton extends StatelessWidget {
           ),
         ),
       ),
+    ),
     );
   }
 }
