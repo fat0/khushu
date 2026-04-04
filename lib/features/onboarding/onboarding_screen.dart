@@ -100,20 +100,14 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               ),
               const SizedBox(height: 32),
 
-              // Location
-              if (_locationLoading)
-                const SizedBox(
-                  height: 20,
-                  width: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              else if (_locationName != null)
+              // Location — show city name if set, otherwise search field
+              if (_locationName != null)
                 Text(
                   _locationName!,
                   style: theme.textTheme.bodyMedium?.copyWith(fontSize: 14),
                   textAlign: TextAlign.center,
                 )
-              else ...[
+              else
                 Row(
                   children: [
                     Expanded(
@@ -133,13 +127,18 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    IconButton(
-                      onPressed: _searchCity,
-                      icon: const Icon(Icons.search),
-                    ),
+                    _locationLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : IconButton(
+                            onPressed: _searchCity,
+                            icon: const Icon(Icons.search),
+                          ),
                   ],
                 ),
-              ],
 
               const SizedBox(height: 32),
 
