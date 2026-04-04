@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/models/user_settings.dart';
 import '../../core/theme/app_colors.dart';
-import '../settings/settings_provider.dart';
 import 'onboarding_provider.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
@@ -15,45 +14,19 @@ class OnboardingScreen extends ConsumerStatefulWidget {
 
 class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   String? _locationName;
-  bool _locationLoading = false;
+  bool _searching = false;
   final _cityController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    // Fire and forget — don't block UI
-    Future.microtask(() => _tryGps());
-  }
-
-  Future<void> _tryGps() async {
-    if (!mounted) return;
-    setState(() => _locationLoading = true);
-    try {
-      final controller = ref.read(onboardingProvider);
-      final success = await controller.setupLocation();
-      if (mounted) {
-        setState(() {
-          _locationLoading = false;
-          if (success) {
-            _locationName = ref.read(settingsProvider).locationName;
-          }
-        });
-      }
-    } catch (_) {
-      if (mounted) setState(() => _locationLoading = false);
-    }
-  }
 
   Future<void> _searchCity() async {
     final query = _cityController.text.trim();
     if (query.isEmpty) return;
 
-    setState(() => _locationLoading = true);
+    setState(() => _searching = true);
     final controller = ref.read(onboardingProvider);
     final result = await controller.searchCity(query);
     if (mounted) {
       setState(() {
-        _locationLoading = false;
+        _searching = false;
         if (result != null) {
           _locationName = result.name;
           _cityController.clear();
@@ -109,7 +82,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               ),
               const SizedBox(height: 32),
 
-              // Location — show city name if set, otherwise search field
+              // Location
               if (_locationName != null)
                 Text(
                   _locationName!,
@@ -122,6 +95,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     Expanded(
                       child: TextField(
                         controller: _cityController,
+                        enabled: !_searching,
                         decoration: InputDecoration(
                           hintText: 'Enter your city...',
                           border: OutlineInputBorder(
@@ -136,16 +110,16 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    _locationLoading
-                        ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : IconButton(
-                            onPressed: _searchCity,
-                            icon: const Icon(Icons.search),
-                          ),
+                    IconButton(
+                      onPressed: _searching ? null : _searchCity,
+                      icon: _searching
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Icon(Icons.search),
+                    ),
                   ],
                 ),
 
