@@ -1,11 +1,11 @@
-enum Tradition {
+enum Fiqh {
   sunniStandard,
   sunniHanafi,
   jafari,
 }
 
 class UserSettings {
-  final Tradition tradition;
+  final Fiqh fiqh;
   final int? methodId;
   final bool combinePrayers;
   final bool? darkMode;
@@ -15,7 +15,7 @@ class UserSettings {
   final bool onboardingComplete;
 
   const UserSettings({
-    this.tradition = Tradition.sunniStandard,
+    this.fiqh = Fiqh.sunniStandard,
     this.methodId,
     this.combinePrayers = false,
     this.darkMode,
@@ -25,15 +25,15 @@ class UserSettings {
     this.onboardingComplete = false,
   });
 
-  int get apiSchool => tradition == Tradition.sunniHanafi ? 1 : 0;
+  int get apiSchool => fiqh == Fiqh.sunniHanafi ? 1 : 0;
 
   int get apiMethod {
-    if (tradition == Tradition.jafari) return 0;
+    if (fiqh == Fiqh.jafari) return 0;
     return methodId ?? 3;
   }
 
   UserSettings copyWith({
-    Tradition? tradition,
+    Fiqh? fiqh,
     int? methodId,
     bool? combinePrayers,
     bool? darkMode,
@@ -43,7 +43,7 @@ class UserSettings {
     bool? onboardingComplete,
   }) {
     return UserSettings(
-      tradition: tradition ?? this.tradition,
+      fiqh: fiqh ?? this.fiqh,
       methodId: methodId ?? this.methodId,
       combinePrayers: combinePrayers ?? this.combinePrayers,
       darkMode: darkMode ?? this.darkMode,
@@ -55,7 +55,7 @@ class UserSettings {
   }
 
   Map<String, dynamic> toJson() => {
-        'tradition': tradition.index,
+        'fiqh': fiqh.index,
         'methodId': methodId,
         'combinePrayers': combinePrayers,
         'darkMode': darkMode,
@@ -66,7 +66,7 @@ class UserSettings {
       };
 
   factory UserSettings.fromJson(Map<String, dynamic> json) => UserSettings(
-        tradition: Tradition.values[json['tradition'] as int? ?? 0],
+        fiqh: Fiqh.values[json['fiqh'] as int? ?? 0],
         methodId: json['methodId'] as int?,
         combinePrayers: json['combinePrayers'] as bool? ?? false,
         darkMode: json['darkMode'] as bool?,

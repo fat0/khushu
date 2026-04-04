@@ -2,17 +2,17 @@
 
 ## Overview
 
-Khushu (خشوع) is a cross-platform Islamic prayer times app built with Flutter. It supports Sunni and Shia prayer time calculations — promoting unity across the Ummah.
+Khushu (خشوع) is a cross-platform Islamic prayer times app built with Flutter. It supports different Sunni and Shia prayer time calculations — promoting unity across the Ummah.
 
 **Mission:** One Ummah Serving Allah
 
 ## Problem
 
-Most prayer apps only support Sunni or Shia calculation methods. Salaat is shared by all Muslims and we want to foster Ummatic unity by accommodating each other's prayer schedules.
+Existing prayer apps in app stores serve either Sunni or Shia Muslims, reinforcing sectarian divisions. There is no single prayer app that treats all madhabs as first-class citizens.
 
 ## Solution
 
-A free, ad-free, open source prayer app that provides accurate prayer times for both Sunni and Shia traditions from a single, calm, welcoming interface. The app auto-detects the best regional calculation method and asks one simple question about the user's prayer tradition.
+A free, ad-free, open source prayer app that provides accurate prayer times for both Sunni and Shia fiqhs from a single, calm, welcoming interface. The app auto-detects the best regional calculation method and asks one simple question about the user's prayer fiqh.
 
 ## MVP Scope
 
@@ -24,7 +24,7 @@ The MVP is focused exclusively on prayer times. All other features are deferred 
 - "One Ummah Serving Allah" mission statement at top
 - GPS location permission prompt — auto-detects regional calculation method
 - If GPS denied, falls back to manual city search
-- One simple question: "Which tradition do you follow?"
+- One simple question: "Which fiqh do you follow?"
   - Sunni (Standard Asr)
   - Sunni (Hanafi Asr)
   - Shia (Jafari)
@@ -51,7 +51,7 @@ The MVP is focused exclusively on prayer times. All other features are deferred 
 **2. Prayer Times (main screen)**
 - Header: line art dome motif with app name, location, and date inside
 - Next prayer card: prayer name + countdown timer
-- Prayer times list: Fajr, Sunrise, Dhuhr, Asr, Maghrib, Isha (always 6 rows for all traditions)
+- Prayer times list: Fajr, Sunrise, Dhuhr, Asr, Maghrib, Isha (always 6 rows for all fiqhs)
 - "Combine prayers" toggle — available to all users (Sunni travelers, Jafari daily practice)
   - When enabled, Dhuhr+Asr shown as one combined row, Maghrib+Isha as one combined row
 - Current/next prayer highlighted with accent bar
@@ -59,7 +59,7 @@ The MVP is focused exclusively on prayer times. All other features are deferred 
 - Location name displayed
 
 **3. Settings**
-- Change tradition (Sunni Standard / Sunni Hanafi / Shia Jafari)
+- Change fiqh (Sunni Standard / Sunni Hanafi / Shia Jafari)
 - Override calculation method (full list of all 20+ methods for power users)
 - Change location (GPS auto-detect or manual city search)
 - Toggle combine prayers
@@ -69,11 +69,11 @@ The MVP is focused exclusively on prayer times. All other features are deferred 
 
 1. App requests GPS location → coordinates stored in Hive
 2. App auto-detects regional calculation method from coordinates
-3. User selects tradition (Sunni Standard / Sunni Hanafi / Shia Jafari) → stored in Hive
+3. User selects fiqh (Sunni Standard / Sunni Hanafi / Shia Jafari) → stored in Hive
 4. App fetches prayer times from AlAdhan API using method + school + coordinates
 5. Prayer times cached in Hive for the day
 6. On next app open, cached times displayed immediately
-7. Cache refreshed daily or when location/tradition changes
+7. Cache refreshed daily or when location/fiqh changes
 
 ## Architecture
 
@@ -86,7 +86,7 @@ The MVP is focused exclusively on prayer times. All other features are deferred 
 
 ### Local Storage
 - **Hive** — lightweight, pure-Dart NoSQL database for:
-  - User settings (tradition, calculation method, location, theme, combine prayers)
+  - User settings (fiqh, calculation method, location, theme, combine prayers)
   - Cached prayer times (daily)
 
 ### Prayer Times Source (MVP)
@@ -101,7 +101,7 @@ lib/
   core/              # Theme, storage, utils, API client
   features/
     prayer_times/    # Prayer time fetching, display, caching
-    onboarding/      # Mission statement + madhab selection
+    onboarding/      # Mission statement + fiqh selection
     settings/        # User preferences
   navigation/        # GoRouter config
 ```
