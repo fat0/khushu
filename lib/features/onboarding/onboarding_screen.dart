@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../core/location/city_data.dart';
+import '../../core/location/region_detector.dart';
 import '../../core/models/user_settings.dart';
 import '../../core/theme/app_colors.dart';
-import 'onboarding_provider.dart';
+import '../settings/settings_provider.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
@@ -13,39 +15,22 @@ class OnboardingScreen extends ConsumerStatefulWidget {
 }
 
 class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
-  String? _locationName;
-  bool _searching = false;
-  final _cityController = TextEditingController();
+  City? _selectedCity;
 
-  Future<void> _searchCity() async {
-    final query = _cityController.text.trim();
-    if (query.isEmpty) return;
-
-    setState(() => _searching = true);
-    final controller = ref.read(onboardingProvider);
-    final result = await controller.searchCity(query);
-    if (mounted) {
-      setState(() {
-        _searching = false;
-        if (result != null) {
-          _locationName = result.name;
-          _cityController.clear();
-        }
-      });
-    }
+  Future<void> _selectCity(City city) async {
+    final methodId = RegionDetector.detectMethod(city.latitude, city.longitude);
+    final notifier = ref.read(settingsProvider.notifier);
+    await notifier.setLocation(city.latitude, city.longitude, city.displayName);
+    await notifier.setMethodId(methodId);
+    setState(() => _selectedCity = city);
   }
 
   Future<void> _selectFiqh(Fiqh fiqh) async {
-    if (_locationName == null) return;
-    final controller = ref.read(onboardingProvider);
-    await controller.selectFiqh(fiqh);
+    if (_selectedCity == null) return;
+    final notifier = ref.read(settingsProvider.notifier);
+    await notifier.setFiqh(fiqh);
+    await notifier.completeOnboarding();
     if (mounted) context.go('/prayer-times');
-  }
-
-  @override
-  void dispose() {
-    _cityController.dispose();
-    super.dispose();
   }
 
   @override
@@ -56,16 +41,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
-            child: SizedBox(
-              height: MediaQuery.of(context).size.height -
-                  MediaQuery.of(context).padding.top -
-                  MediaQuery.of(context).padding.bottom - 48,
-              child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
+          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 48),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(height: 40),
               Text(
                 'KHUSHU',
                 style: theme.textTheme.headlineMedium,
@@ -80,52 +60,92 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 40),
 
-              // Location
-              if (_locationName != null)
+              // City autocomplete
+              if (_selectedCity != null) ...[
                 Text(
-                  _locationName!,
-                  style: theme.textTheme.bodyMedium?.copyWith(fontSize: 14),
+                  _selectedCity!.displayName,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: isDark ? AppColors.sage : AppColors.deepGreen,
+                  ),
                   textAlign: TextAlign.center,
-                )
-              else
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: _cityController,
-                        enabled: !_searching,
-                        decoration: InputDecoration(
-                          hintText: 'Enter your city...',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
+                ),
+                TextButton(
+                  onPressed: () => setState(() => _selectedCity = null),
+                  child: const Text(
+                    'Change city',
+                    style: TextStyle(fontSize: 12, color: AppColors.sage),
+                  ),
+                ),
+              ] else
+                Autocomplete<City>(
+                  displayStringForOption: (city) => city.displayName,
+                  optionsBuilder: (textEditingValue) {
+                    if (textEditingValue.text.length < 2) return const [];
+                    final query = textEditingValue.text.toLowerCase();
+                    return cities.where((city) =>
+                        city.name.toLowerCase().contains(query) ||
+                        city.country.toLowerCase().contains(query));
+                  },
+                  onSelected: _selectCity,
+                  fieldViewBuilder: (context, controller, focusNode, onSubmitted) {
+                    return TextField(
+                      controller: controller,
+                      focusNode: focusNode,
+                      decoration: InputDecoration(
+                        hintText: 'Search your city...',
+                        prefixIcon: Icon(Icons.search, size: 20, color: isDark ? AppColors.darkSecondary : AppColors.lightSecondary),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                      ),
+                      onSubmitted: (_) => onSubmitted(),
+                    );
+                  },
+                  optionsViewBuilder: (context, onSelected, options) {
+                    return Align(
+                      alignment: Alignment.topLeft,
+                      child: Material(
+                        elevation: 4,
+                        borderRadius: BorderRadius.circular(12),
+                        color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxHeight: 200),
+                          child: ListView.builder(
+                            padding: EdgeInsets.zero,
+                            shrinkWrap: true,
+                            itemCount: options.length,
+                            itemBuilder: (context, index) {
+                              final city = options.elementAt(index);
+                              return ListTile(
+                                dense: true,
+                                title: Text(
+                                  city.displayName,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: isDark ? AppColors.sage : AppColors.deepGreen,
+                                  ),
+                                ),
+                                onTap: () => onSelected(city),
+                              );
+                            },
                           ),
                         ),
-                        onSubmitted: (_) => _searchCity(),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    IconButton(
-                      onPressed: _searching ? null : _searchCity,
-                      icon: _searching
-                          ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : const Icon(Icons.search),
-                    ),
-                  ],
+                    );
+                  },
                 ),
 
               const SizedBox(height: 32),
 
-              // Fiqh selection — always visible
+              // Fiqh selection
               Text(
                 'Which fiqh do you follow?',
                 style: theme.textTheme.bodyMedium?.copyWith(fontSize: 14),
@@ -136,7 +156,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 label: 'Sunni (Standard Asr)',
                 subtitle: 'Maliki, Shafi\'i, Hanbali',
                 isDark: isDark,
-                enabled: _locationName != null,
+                enabled: _selectedCity != null,
                 onTap: () => _selectFiqh(Fiqh.sunniStandard),
               ),
               const SizedBox(height: 10),
@@ -144,7 +164,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 label: 'Sunni (Hanafi Asr)',
                 subtitle: 'Later Asr prayer time',
                 isDark: isDark,
-                enabled: _locationName != null,
+                enabled: _selectedCity != null,
                 onTap: () => _selectFiqh(Fiqh.sunniHanafi),
               ),
               const SizedBox(height: 10),
@@ -152,12 +172,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 label: 'Shia (Jafari)',
                 subtitle: 'Ithna-Ashari jurisprudence',
                 isDark: isDark,
-                enabled: _locationName != null,
+                enabled: _selectedCity != null,
                 onTap: () => _selectFiqh(Fiqh.jafari),
               ),
             ],
-          ),
-        ),
           ),
         ),
       ),
@@ -182,52 +200,53 @@ class _FiqhButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final opacity = enabled ? 1.0 : 0.4;
     return Opacity(
-      opacity: opacity,
+      opacity: enabled ? 1.0 : 0.4,
       child: Material(
-      color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
-      borderRadius: BorderRadius.circular(12),
-      child: InkWell(
-        onTap: enabled ? onTap : null,
+        color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
         borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      label,
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: isDark ? AppColors.sage : AppColors.deepGreen,
+        child: InkWell(
+          onTap: enabled ? onTap : null,
+          borderRadius: BorderRadius.circular(12),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        label,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: isDark ? AppColors.sage : AppColors.deepGreen,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      subtitle,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: isDark ? AppColors.darkSecondary : AppColors.lightSecondary,
+                      const SizedBox(height: 2),
+                      Text(
+                        subtitle,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: isDark
+                              ? AppColors.darkSecondary
+                              : AppColors.lightSecondary,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              const Icon(
-                Icons.chevron_right,
-                color: AppColors.sage,
-                size: 20,
-              ),
-            ],
+                const Icon(
+                  Icons.chevron_right,
+                  color: AppColors.sage,
+                  size: 20,
+                ),
+              ],
+            ),
           ),
         ),
       ),
-    ),
     );
   }
 }
