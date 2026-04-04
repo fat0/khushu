@@ -33,6 +33,11 @@ class HiveService {
     return PrayerTimes.fromAlAdhanJson(Map<String, dynamic>.from(json), date);
   }
 
+  static Future<void> clearPrayerCache() async {
+    final box = Hive.box(_cacheBox);
+    await box.clear();
+  }
+
   static Future<void> cachePrayerTimes(PrayerTimes times) async {
     final box = Hive.box(_cacheBox);
     final key = '${times.date.year}-${times.date.month}-${times.date.day}';
