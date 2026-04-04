@@ -12,14 +12,19 @@ class OnboardingController {
   OnboardingController(this._ref);
 
   Future<bool> setupLocation() async {
-    final result = await LocationService.getCurrentLocation();
-    if (result == null) return false;
+    try {
+      final result = await LocationService.getCurrentLocation()
+          .timeout(const Duration(seconds: 10));
+      if (result == null) return false;
 
-    final methodId = RegionDetector.detectMethod(result.latitude, result.longitude);
-    final notifier = _ref.read(settingsProvider.notifier);
-    await notifier.setLocation(result.latitude, result.longitude, result.name);
-    await notifier.setMethodId(methodId);
-    return true;
+      final methodId = RegionDetector.detectMethod(result.latitude, result.longitude);
+      final notifier = _ref.read(settingsProvider.notifier);
+      await notifier.setLocation(result.latitude, result.longitude, result.name);
+      await notifier.setMethodId(methodId);
+      return true;
+    } catch (_) {
+      return false;
+    }
   }
 
   Future<void> selectFiqh(Fiqh fiqh) async {

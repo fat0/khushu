@@ -21,20 +21,26 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   @override
   void initState() {
     super.initState();
-    _tryGps();
+    // Fire and forget — don't block UI
+    Future.microtask(() => _tryGps());
   }
 
   Future<void> _tryGps() async {
+    if (!mounted) return;
     setState(() => _locationLoading = true);
-    final controller = ref.read(onboardingProvider);
-    final success = await controller.setupLocation();
-    if (mounted) {
-      setState(() {
-        _locationLoading = false;
-        if (success) {
-          _locationName = ref.read(settingsProvider).locationName;
-        }
-      });
+    try {
+      final controller = ref.read(onboardingProvider);
+      final success = await controller.setupLocation();
+      if (mounted) {
+        setState(() {
+          _locationLoading = false;
+          if (success) {
+            _locationName = ref.read(settingsProvider).locationName;
+          }
+        });
+      }
+    } catch (_) {
+      if (mounted) setState(() => _locationLoading = false);
     }
   }
 
