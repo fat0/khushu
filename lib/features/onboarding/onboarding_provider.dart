@@ -22,9 +22,9 @@ class OnboardingController {
     return true;
   }
 
-  Future<void> selectTradition(Tradition tradition) async {
+  Future<void> selectFiqh(Fiqh fiqh) async {
     final notifier = _ref.read(settingsProvider.notifier);
-    await notifier.setTradition(tradition);
+    await notifier.setFiqh(fiqh);
     await notifier.completeOnboarding();
   }
 

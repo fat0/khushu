@@ -42,14 +42,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          // Tradition
-          const _SectionHeader('Prayer Tradition'),
+          // Fiqh
+          const _SectionHeader('Fiqh'),
           const SizedBox(height: 8),
-          ...Tradition.values.map((t) => _TraditionTile(
-                tradition: t,
-                isSelected: settings.tradition == t,
+          ...Fiqh.values.map((t) => _FiqhTile(
+                fiqh: t,
+                isSelected: settings.fiqh == t,
                 isDark: isDark,
-                onTap: () => ref.read(settingsProvider.notifier).setTradition(t),
+                onTap: () => ref.read(settingsProvider.notifier).setFiqh(t),
               )),
 
           const SizedBox(height: 24),
@@ -225,23 +225,23 @@ class _SectionHeader extends StatelessWidget {
   }
 }
 
-class _TraditionTile extends StatelessWidget {
-  final Tradition tradition;
+class _FiqhTile extends StatelessWidget {
+  final Fiqh fiqh;
   final bool isSelected;
   final bool isDark;
   final VoidCallback onTap;
 
-  const _TraditionTile({
-    required this.tradition,
+  const _FiqhTile({
+    required this.fiqh,
     required this.isSelected,
     required this.isDark,
     required this.onTap,
   });
 
-  String get _label => switch (tradition) {
-        Tradition.sunniStandard => 'Sunni (Standard Asr)',
-        Tradition.sunniHanafi => 'Sunni (Hanafi Asr)',
-        Tradition.jafari => 'Shia (Jafari)',
+  String get _label => switch (fiqh) {
+        Fiqh.sunniStandard => 'Sunni (Standard Asr)',
+        Fiqh.sunniHanafi => 'Sunni (Hanafi Asr)',
+        Fiqh.jafari => 'Shia (Jafari)',
       };
 
   @override

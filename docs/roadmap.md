@@ -1,12 +1,12 @@
 # Khushu Roadmap
 
 ## MVP
-- Prayer times for Sunni (Standard + Hanafi) and Shia (Jafari) traditions
+- Prayer times for Sunni (Standard + Hanafi) and Shia (Jafari) fiqh schools
   - GPS auto-detect location + manual city search fallback
   - Auto-detect regional calculation method from user's location
   - API-only prayer times (AlAdhan API) with daily caching
   - Main screen: current/next prayer with countdown, all prayer times for the day, current date, location name
-  - "Combine prayers" toggle available to all traditions (Sunni travelers, Jafari daily)
+  - "Combine prayers" toggle available to all fiqh schools (Sunni travelers, Jafari daily)
   - Onboarding: single screen — mission statement + one question (Sunni Standard / Sunni Hanafi / Shia Jafari)
   - Settings: override calculation method (full list for power users)
   - Light and dark mode
