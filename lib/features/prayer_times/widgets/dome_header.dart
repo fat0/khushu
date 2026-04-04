@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../../../core/theme/app_colors.dart';
 
+/// Dome header sizing and text position documented in docs/dome-header-spec.md
+/// Text at 53% from top, date line aligns with dome bottom edge.
 class DomeHeader extends StatelessWidget {
   final String locationName;
   final String date;
@@ -14,126 +17,76 @@ class DomeHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final strokeColor = isDark ? AppColors.sage : AppColors.deepGreen;
-    final strokeOpacity = isDark ? 0.32 : 0.45;
     final textColor = isDark ? AppColors.sage : AppColors.deepGreen;
     final secondaryColor = isDark ? AppColors.darkSecondary : AppColors.lightSecondary;
+    final svgColor = isDark
+        ? AppColors.sage.withValues(alpha: 0.32)
+        : AppColors.deepGreen.withValues(alpha: 0.45);
+
+    final screenWidth = MediaQuery.of(context).size.width;
+    // Scale SVG 1.5x wider than screen for proper dome size
+    final svgDisplayWidth = screenWidth * 1.5;
+    final svgDisplayHeight = svgDisplayWidth / 1.5;
+    // Crop bottom 25% — SVG has empty space below dome line
+    final containerHeight = svgDisplayHeight * 0.75;
+    final textTop = containerHeight * 0.70;
 
     return SizedBox(
-      height: 135,
-      child: CustomPaint(
-        size: const Size(double.infinity, 135),
-        painter: _DomePainter(
-          strokeColor: strokeColor,
-          opacity: strokeOpacity,
-          isDark: isDark,
-        ),
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.only(top: 20),
+      height: containerHeight,
+      width: screenWidth,
+      child: ClipRect(
+        child: Stack(
+        clipBehavior: Clip.none,
+        alignment: Alignment.topCenter,
+        children: [
+          // Dome SVG — wider than screen, centered, bottom cropped
+          Positioned(
+            top: 0,
+            left: -(svgDisplayWidth - screenWidth) / 2,
+            width: svgDisplayWidth,
+            height: svgDisplayHeight,
+            child: SvgPicture.asset(
+              'assets/images/dome.svg',
+              fit: BoxFit.fill,
+              colorFilter: ColorFilter.mode(svgColor, BlendMode.srcIn),
+            ),
+          ),
+          // Text overlay — positioned at 53% from top (inside dome belly)
+          Positioned(
+            top: textTop,
+            left: 0,
+            right: 0,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
                   'KHUSHU',
                   style: TextStyle(
-                    fontSize: 15,
+                    fontSize: 18,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 3,
                     color: textColor,
                   ),
+                  textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 8),
                 Text(
                   locationName,
-                  style: TextStyle(fontSize: 12, color: secondaryColor),
+                  style: TextStyle(fontSize: 14, color: secondaryColor),
+                  textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 5),
                 Text(
                   date,
-                  style: const TextStyle(fontSize: 11, color: AppColors.sage),
+                  style: const TextStyle(fontSize: 13, color: AppColors.sage),
+                  textAlign: TextAlign.center,
                 ),
               ],
             ),
           ),
-        ),
+        ],
+      ),
       ),
     );
   }
-}
-
-class _DomePainter extends CustomPainter {
-  final Color strokeColor;
-  final double opacity;
-  final bool isDark;
-
-  _DomePainter({
-    required this.strokeColor,
-    required this.opacity,
-    required this.isDark,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = strokeColor.withOpacity(opacity)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.3;
-
-    final cx = size.width / 2;
-    final bottom = size.height;
-
-    // Left minaret — two parallel lines + pointed top, open bottom
-    canvas.drawLine(Offset(cx - 115, bottom), Offset(cx - 115, 50), paint);
-    canvas.drawLine(Offset(cx - 105, bottom), Offset(cx - 105, 50), paint);
-    final leftTop = Path()
-      ..moveTo(cx - 115, 50)
-      ..quadraticBezierTo(cx - 115, 38, cx - 110, 28)
-      ..quadraticBezierTo(cx - 105, 38, cx - 105, 50);
-    canvas.drawPath(leftTop, paint);
-
-    // Right minaret
-    canvas.drawLine(Offset(cx + 105, bottom), Offset(cx + 105, 50), paint);
-    canvas.drawLine(Offset(cx + 115, bottom), Offset(cx + 115, 50), paint);
-    final rightTop = Path()
-      ..moveTo(cx + 105, 50)
-      ..quadraticBezierTo(cx + 105, 38, cx + 110, 28)
-      ..quadraticBezierTo(cx + 115, 38, cx + 115, 50);
-    canvas.drawPath(rightTop, paint);
-
-    // Dome arc — open bottom
-    final dome = Path()
-      ..moveTo(cx - 105, bottom)
-      ..arcToPoint(
-        Offset(cx + 105, bottom),
-        radius: const Radius.elliptical(120, 95),
-        clockwise: false,
-      );
-    canvas.drawPath(dome, paint);
-
-    // Crescent moon — tilted, open side facing right
-    canvas.save();
-    canvas.translate(cx, 14);
-    canvas.rotate(-0.52); // ~-30 degrees
-    canvas.scale(-1, 1); // flip horizontal so open side faces right
-
-    final moonPaint = Paint()
-      ..color = strokeColor.withOpacity(opacity)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.3;
-    canvas.drawCircle(Offset.zero, 6, moonPaint);
-
-    final moonCutout = Paint()
-      ..color = isDark ? AppColors.darkBackground : AppColors.lightBackground
-      ..style = PaintingStyle.fill;
-    canvas.drawCircle(const Offset(2.8, -1.5), 5, moonCutout);
-
-    canvas.restore();
-
-    // Finial stem
-    canvas.drawLine(Offset(cx, 24), Offset(cx, 34), paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import '../../core/debug_log.dart';
+import '../../core/location/location_service.dart';
+import '../../core/location/region_detector.dart';
 import '../../core/theme/app_colors.dart';
 import '../settings/settings_provider.dart';
 import 'prayer_times_provider.dart';
@@ -9,11 +12,70 @@ import 'widgets/dome_header.dart';
 import 'widgets/next_prayer_card.dart';
 import 'widgets/prayer_times_list.dart';
 
-class PrayerTimesScreen extends ConsumerWidget {
+class PrayerTimesScreen extends ConsumerStatefulWidget {
   const PrayerTimesScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<PrayerTimesScreen> createState() => _PrayerTimesScreenState();
+}
+
+class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen> {
+  bool _checkedLocation = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _checkLocation());
+  }
+
+  Future<void> _checkLocation() async {
+    if (_checkedLocation) return;
+    _checkedLocation = true;
+
+    final settings = ref.read(settingsProvider);
+    if (settings.latitude != null && settings.longitude != null) {
+      DebugLog.gps('Location already set: ${settings.locationName}');
+      return;
+    }
+
+    // Try GPS silently
+    DebugLog.gps('First launch: trying GPS...');
+    final result = await LocationService.getCurrentLocation();
+
+    if (result != null && mounted) {
+      DebugLog.gps('GPS success: ${result.name}');
+      final methodId = RegionDetector.detectMethod(result.latitude, result.longitude);
+      final notifier = ref.read(settingsProvider.notifier);
+      await notifier.setLocation(result.latitude, result.longitude, result.name);
+      await notifier.setMethodId(methodId);
+      return;
+    }
+
+    // GPS failed — show fallback dialog
+    if (mounted) {
+      DebugLog.gpsWarning('GPS failed, showing location dialog');
+      _showLocationDialog();
+    }
+  }
+
+  void _showLocationDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => _LocationDialog(
+        onLocationSet: (result) {
+          final methodId = RegionDetector.detectMethod(result.latitude, result.longitude);
+          final notifier = ref.read(settingsProvider.notifier);
+          notifier.setLocation(result.latitude, result.longitude, result.name);
+          notifier.setMethodId(methodId);
+          Navigator.of(context).pop();
+        },
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final settings = ref.watch(settingsProvider);
     final timesAsync = ref.watch(prayerTimesProvider);
     final countdownAsync = ref.watch(countdownProvider);
@@ -48,10 +110,13 @@ class PrayerTimesScreen extends ConsumerWidget {
             ),
           ),
           data: (times) {
-            final nextPrayer = times.nextPrayer(DateTime.now());
-            final dateStr = DateFormat('EEEE, MMMM d, yyyy').format(DateTime.now());
+            final now = DateTime.now();
+            final currentPrayer = times.currentPrayer(now);
+            final nextPrayer = times.nextPrayer(now);
+            final dateStr = DateFormat('EEEE, MMMM d, yyyy').format(now);
 
             return SingleChildScrollView(
+              padding: const EdgeInsets.only(bottom: 24),
               child: Column(
                 children: [
                   DomeHeader(
@@ -61,15 +126,18 @@ class PrayerTimesScreen extends ConsumerWidget {
                   const SizedBox(height: 8),
                   countdownAsync.when(
                     data: (countdown) => NextPrayerCard(
-                      prayerName: nextPrayer.name,
+                      currentPrayerName: currentPrayer.name,
+                      nextPrayerName: nextPrayer.name,
                       countdown: countdown,
                     ),
                     loading: () => NextPrayerCard(
-                      prayerName: nextPrayer.name,
+                      currentPrayerName: currentPrayer.name,
+                      nextPrayerName: nextPrayer.name,
                       countdown: Duration.zero,
                     ),
                     error: (_, __) => NextPrayerCard(
-                      prayerName: nextPrayer.name,
+                      currentPrayerName: currentPrayer.name,
+                      nextPrayerName: nextPrayer.name,
                       countdown: Duration.zero,
                     ),
                   ),
@@ -77,28 +145,7 @@ class PrayerTimesScreen extends ConsumerWidget {
                   PrayerTimesList(
                     prayerTimes: times,
                     combinePrayers: settings.combinePrayers,
-                    nextPrayerName: nextPrayer.name,
-                  ),
-                  const SizedBox(height: 16),
-                  // Combine prayers toggle
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Combine prayers',
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                        Switch(
-                          value: settings.combinePrayers,
-                          activeColor: AppColors.sage,
-                          onChanged: (value) {
-                            ref.read(settingsProvider.notifier).setCombinePrayers(value);
-                          },
-                        ),
-                      ],
-                    ),
+                    nextPrayerName: currentPrayer.name,
                   ),
                 ],
               ),
@@ -111,6 +158,120 @@ class PrayerTimesScreen extends ConsumerWidget {
         backgroundColor: AppColors.sage,
         child: const Icon(Icons.settings, color: AppColors.cream, size: 20),
       ),
+    );
+  }
+}
+
+class _LocationDialog extends StatefulWidget {
+  final void Function(LocationResult result) onLocationSet;
+
+  const _LocationDialog({required this.onLocationSet});
+
+  @override
+  State<_LocationDialog> createState() => _LocationDialogState();
+}
+
+class _LocationDialogState extends State<_LocationDialog> {
+  final _controller = TextEditingController();
+  bool _searching = false;
+  String? _error;
+
+  Future<void> _search() async {
+    final query = _controller.text.trim();
+    if (query.isEmpty) return;
+
+    setState(() {
+      _searching = true;
+      _error = null;
+    });
+
+    final result = await LocationService.searchCity(query);
+
+    if (!mounted) return;
+
+    if (result != null) {
+      widget.onLocationSet(result);
+    } else {
+      setState(() {
+        _searching = false;
+        _error = 'Could not find "$query". Try another city name.';
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return AlertDialog(
+      backgroundColor: isDark ? AppColors.darkSurface : AppColors.lightSurface,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      title: Text(
+        'Set Your Location',
+        style: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+          color: isDark ? AppColors.sage : AppColors.deepGreen,
+        ),
+      ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'We need your location to calculate accurate prayer times for your area.',
+            style: TextStyle(
+              fontSize: 13,
+              color: isDark ? AppColors.darkSecondary : AppColors.lightSecondary,
+            ),
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _controller,
+            enabled: !_searching,
+            decoration: InputDecoration(
+              hintText: 'Enter your city...',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 12,
+              ),
+            ),
+            onSubmitted: (_) => _search(),
+          ),
+          if (_error != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: Text(
+                _error!,
+                style: const TextStyle(fontSize: 12, color: Colors.redAccent),
+              ),
+            ),
+        ],
+      ),
+      actions: [
+        _searching
+            ? const SizedBox(
+                height: 24,
+                width: 24,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+            : ElevatedButton(
+                onPressed: _search,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.sage,
+                  foregroundColor: AppColors.cream,
+                ),
+                child: const Text('Find'),
+              ),
+      ],
     );
   }
 }
