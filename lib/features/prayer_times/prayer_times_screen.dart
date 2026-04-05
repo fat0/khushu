@@ -144,8 +144,7 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen> {
                   const SizedBox(height: 16),
                   PrayerTimesList(
                     prayerTimes: times,
-                    combinePrayers: settings.combinePrayers,
-                    nextPrayerName: currentPrayer.name,
+                    currentPrayerName: currentPrayer.name,
                   ),
                 ],
               ),

@@ -7,7 +7,6 @@ enum Fiqh {
 class UserSettings {
   final Fiqh fiqh;
   final int? methodId;
-  final bool combinePrayers;
   final bool? darkMode;
   final double? latitude;
   final double? longitude;
@@ -17,7 +16,6 @@ class UserSettings {
   const UserSettings({
     this.fiqh = Fiqh.sunniStandard,
     this.methodId,
-    this.combinePrayers = false,
     this.darkMode,
     this.latitude,
     this.longitude,
@@ -35,7 +33,6 @@ class UserSettings {
   UserSettings copyWith({
     Fiqh? fiqh,
     int? methodId,
-    bool? combinePrayers,
     bool? darkMode,
     double? latitude,
     double? longitude,
@@ -45,7 +42,6 @@ class UserSettings {
     return UserSettings(
       fiqh: fiqh ?? this.fiqh,
       methodId: methodId ?? this.methodId,
-      combinePrayers: combinePrayers ?? this.combinePrayers,
       darkMode: darkMode ?? this.darkMode,
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
@@ -57,7 +53,6 @@ class UserSettings {
   Map<String, dynamic> toJson() => {
         'fiqh': fiqh.index,
         'methodId': methodId,
-        'combinePrayers': combinePrayers,
         'darkMode': darkMode,
         'latitude': latitude,
         'longitude': longitude,
@@ -68,7 +63,6 @@ class UserSettings {
   factory UserSettings.fromJson(Map<String, dynamic> json) => UserSettings(
         fiqh: Fiqh.values[json['fiqh'] as int? ?? 0],
         methodId: json['methodId'] as int?,
-        combinePrayers: json['combinePrayers'] as bool? ?? false,
         darkMode: json['darkMode'] as bool?,
         latitude: json['latitude'] as double?,
         longitude: json['longitude'] as double?,
