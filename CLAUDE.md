@@ -11,3 +11,12 @@
 - If a new secret-bearing file type is introduced, add it to `.gitignore` before committing
 
 If the user pastes a secret in the conversation, warn them immediately and recommend rotating it.
+
+## Git Workflow
+
+**`main` is protected. Never push directly to main.**
+
+- Create a feature branch for all work (e.g., `feat/hijri-calendar`, `fix/asr-cache`)
+- Commit to the feature branch
+- Submit a PR to merge into main
+- Wait for user approval before merging
