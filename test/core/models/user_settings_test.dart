@@ -8,7 +8,6 @@ void main() {
 
       expect(settings.fiqh, Fiqh.sunniStandard);
       expect(settings.methodId, isNull);
-      expect(settings.combinePrayers, false);
       expect(settings.darkMode, isNull);
       expect(settings.latitude, isNull);
       expect(settings.longitude, isNull);

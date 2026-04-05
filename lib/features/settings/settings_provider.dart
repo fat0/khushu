@@ -22,16 +22,6 @@ class SettingsNotifier extends StateNotifier<UserSettings> {
     await HiveService.saveSettings(state);
   }
 
-  Future<void> setCombinePrayers(bool combine) async {
-    state = state.copyWith(combinePrayers: combine);
-    await HiveService.saveSettings(state);
-  }
-
-  Future<void> setDarkMode(bool? darkMode) async {
-    state = state.copyWith(darkMode: darkMode);
-    await HiveService.saveSettings(state);
-  }
-
   Future<void> completeOnboarding() async {
     state = state.copyWith(onboardingComplete: true);
     await HiveService.saveSettings(state);
