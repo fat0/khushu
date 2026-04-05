@@ -27,9 +27,9 @@ class DomeHeader extends StatelessWidget {
     // Scale SVG 1.5x wider than screen for proper dome size
     final svgDisplayWidth = screenWidth * 1.5;
     final svgDisplayHeight = svgDisplayWidth / 1.5;
-    // Crop bottom 25% — SVG has empty space below dome line
-    final containerHeight = svgDisplayHeight * 0.75;
-    final textTop = containerHeight * 0.70;
+    // Crop top 15% and bottom 25% — SVG has empty space above and below dome
+    final containerHeight = svgDisplayHeight * 0.60;
+    final textTop = containerHeight * 0.65;
 
     return SizedBox(
       height: containerHeight,
@@ -39,9 +39,9 @@ class DomeHeader extends StatelessWidget {
         clipBehavior: Clip.none,
         alignment: Alignment.topCenter,
         children: [
-          // Dome SVG — wider than screen, centered, bottom cropped
+          // Dome SVG — wider than screen, centered, top and bottom cropped
           Positioned(
-            top: 0,
+            top: -svgDisplayHeight * 0.15,
             left: -(svgDisplayWidth - screenWidth) / 2,
             width: svgDisplayWidth,
             height: svgDisplayHeight,
