@@ -209,9 +209,8 @@ class _FiqhTile extends StatelessWidget {
   });
 
   String get _label => switch (fiqh) {
-        Fiqh.sunniStandard => 'Maliki, Hanbali, Shafi\'i',
-        Fiqh.sunniHanafi => 'Hanafi',
-        Fiqh.jafari => 'Ja\'fari',
+        Fiqh.sunni => 'Sunni (Maliki, Hanafi, Hanbali, Shafi\'i)',
+        Fiqh.jafari => 'Shia (Ja\'fari)',
       };
 
   @override

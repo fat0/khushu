@@ -1,11 +1,17 @@
 class PrayerTimeEntry {
   final String name;
   final String time;
+  final String? secondaryName;
+  final String? secondaryTime;
 
   const PrayerTimeEntry({
     required this.name,
     required this.time,
+    this.secondaryName,
+    this.secondaryTime,
   });
+
+  bool get hasDualTime => secondaryTime != null;
 }
 
 class PrayerTimes {
@@ -13,6 +19,7 @@ class PrayerTimes {
   final String sunrise;
   final String dhuhr;
   final String asr;
+  final String? asrHanafi;
   final String maghrib;
   final String isha;
   final DateTime date;
@@ -22,6 +29,7 @@ class PrayerTimes {
     required this.sunrise,
     required this.dhuhr,
     required this.asr,
+    this.asrHanafi,
     required this.maghrib,
     required this.isha,
     required this.date,
@@ -39,12 +47,30 @@ class PrayerTimes {
     );
   }
 
+  PrayerTimes withHanafiAsr(String hanafiAsr) {
+    return PrayerTimes(
+      fajr: fajr,
+      sunrise: sunrise,
+      dhuhr: dhuhr,
+      asr: asr,
+      asrHanafi: hanafiAsr,
+      maghrib: maghrib,
+      isha: isha,
+      date: date,
+    );
+  }
+
   List<PrayerTimeEntry> toDisplayList() {
     return [
       PrayerTimeEntry(name: 'Fajr', time: fajr),
       PrayerTimeEntry(name: 'Sunrise', time: sunrise),
       PrayerTimeEntry(name: 'Dhuhr', time: dhuhr),
-      PrayerTimeEntry(name: 'Asr', time: asr),
+      PrayerTimeEntry(
+        name: 'Asr',
+        time: asr,
+        secondaryName: asrHanafi != null ? 'Asr (Hanafi)' : null,
+        secondaryTime: asrHanafi,
+      ),
       PrayerTimeEntry(name: 'Maghrib', time: maghrib),
       PrayerTimeEntry(name: 'Isha', time: isha),
     ];
@@ -52,7 +78,6 @@ class PrayerTimes {
 
   /// Returns the current prayer (the most recent prayer that has started)
   PrayerTimeEntry currentPrayer(DateTime now) {
-    // Only actual prayers, not sunrise
     final prayers = [
       PrayerTimeEntry(name: 'Fajr', time: fajr),
       PrayerTimeEntry(name: 'Dhuhr', time: dhuhr),

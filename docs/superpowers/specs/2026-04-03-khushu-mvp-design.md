@@ -8,31 +8,23 @@ Khushu (خشوع) is a cross-platform Islamic prayer times app built with Flutte
 
 ## Problem
 
-Existing prayer apps in app stores serve either Sunni or Shia Muslims, reinforcing sectarian divisions. There is no single prayer app that treats all madhabs as first-class citizens.
+Most prayer apps only support Sunni or Shia calculation methods, and none help you learn how to pray. Salaat is shared by all Muslims — reverts, children, and lifelong practitioners alike deserve a single app that meets them wherever they are in their learning journey.
 
 ## Solution
 
-A free, ad-free, open source prayer app that provides accurate prayer times for both Sunni and Shia fiqhs from a single, calm, welcoming interface. The app auto-detects the best regional calculation method and asks one simple question about the user's prayer fiqh.
+A free, ad-free, open source prayer app with a clean, simple interface that helps you wherever you are along your salaat learning journey. It provides accurate prayer times for both Sunni and Shia fiqhs, shows rakat breakdowns per prayer per fiqh, and promotes Ummatic unity by treating all fiqhs as first-class citizens.
 
 ## MVP Scope
 
 The MVP is focused exclusively on prayer times. All other features are deferred to the roadmap.
 
-### Screens
+### First Launch
 
-**1. Onboarding (single screen)**
-- "One Ummah Serving Allah" mission statement at top
-- GPS location permission prompt — auto-detects regional calculation method
-- If GPS denied, falls back to manual city search
-- One simple question: "Which fiqh do you follow?"
-  - Sunni (Standard Asr)
-  - Sunni (Hanafi Asr)
-  - Shia (Jafari)
-- Selection maps to API parameters:
-  - Sunni Standard → regional method (auto-detected) + `school=0`
-  - Sunni Hanafi → regional method (auto-detected) + `school=1`
-  - Shia Jafari → `method=0` (Qum) + `school=0`
-- Navigates straight to prayer times
+No onboarding screen. On first launch:
+- GPS auto-detects location silently in the background
+- If GPS fails, a dialog prompts the user to enter their city (with explanation of why location is needed)
+- Default fiqh: Maliki/Hanbali/Shafi'i (school=0). User changes in settings.
+- App goes straight to the prayer times screen
 
 **Regional method auto-detection:**
 | User's region | AlAdhan method |
@@ -48,32 +40,32 @@ The MVP is focused exclusively on prayer times. All other features are deferred 
 | Iran (Shia) | Tehran (7) |
 | Default | MWL (3) |
 
-**2. Prayer Times (main screen)**
-- Header: line art dome motif with app name, location, and date inside
-- Next prayer card: prayer name + countdown timer
-- Prayer times list: Fajr, Sunrise, Dhuhr, Asr, Maghrib, Isha (always 6 rows for all fiqhs)
-- "Combine prayers" toggle — available to all users (Sunni travelers, Jafari daily practice)
-  - When enabled, Dhuhr+Asr shown as one combined row, Maghrib+Isha as one combined row
-- Current/next prayer highlighted with accent bar
-- Current date displayed
-- Location name displayed
+### Screens
 
-**3. Settings**
-- Change fiqh (Sunni Standard / Sunni Hanafi / Shia Jafari)
-- Override calculation method (full list of all 20+ methods for power users)
-- Change location (GPS auto-detect or manual city search)
-- Toggle combine prayers
-- Toggle light/dark mode
+**1. Prayer Times (main screen)**
+- Header: SVG dome motif with app name ("KHUSHU"), "One Ummah Serving Allah", location, and date inside the dome
+- Current prayer card: horizontal layout — current prayer name on left, countdown to next prayer on right
+- Prayer times list: Fajr, Sunrise, Dhuhr, Asr, Maghrib, Isha (always 6 rows for all fiqhs)
+- Current prayer highlighted in the list
+- Current date displayed inside dome
+- Location name displayed inside dome
+
+**2. Settings**
+- Fiqh (Juristic Method): Maliki/Hanbali/Shafi'i | Hanafi | Ja'fari
+- Calculation Method: dropdown of all AlAdhan methods (auto-detected by default)
+- Location: GPS auto-detect or manual city search
+- Theme follows system light/dark mode automatically (no user toggle)
 
 ### Data Flow
 
-1. App requests GPS location → coordinates stored in Hive
-2. App auto-detects regional calculation method from coordinates
-3. User selects fiqh (Sunni Standard / Sunni Hanafi / Shia Jafari) → stored in Hive
-4. App fetches prayer times from AlAdhan API using method + school + coordinates
-5. Prayer times cached in Hive for the day
-6. On next app open, cached times displayed immediately
-7. Cache refreshed daily or when location/fiqh changes
+1. App requests GPS location silently → coordinates stored in Hive
+2. If GPS fails, dialog prompts user to enter city → geocoded to coordinates
+3. App auto-detects regional calculation method from coordinates
+4. Default fiqh: Maliki/Hanbali/Shafi'i (school=0) → stored in Hive
+5. App fetches prayer times from AlAdhan API using method + school + coordinates
+6. Prayer times cached in Hive for the day
+7. On next app open, cached times displayed immediately
+8. Cache cleared and refreshed when location, fiqh, or calculation method changes
 
 ## Architecture
 
@@ -101,7 +93,6 @@ lib/
   core/              # Theme, storage, utils, API client
   features/
     prayer_times/    # Prayer time fetching, display, caching
-    onboarding/      # Mission statement + fiqh selection
     settings/        # User preferences
   navigation/        # GoRouter config
 ```
@@ -131,7 +122,7 @@ lib/
 - Secondary text: muted gray (#6b6b62 / #8a8a80)
 - Card backgrounds: dark earth (#2A2A27)
 - Next prayer card: dark green gradient (#2A4228 → #3D5A3A)
-- Follows system theme by default, overridable in settings
+- Follows system theme automatically (no user toggle)
 
 ### Typography
 - Light weight (300) for prayer names and large text
@@ -164,7 +155,7 @@ lib/
 
 - **AlAdhan API downtime:** Mitigated by daily caching — app only needs API once per day. Offline calculation (adhan-dart) is on the roadmap.
 - **Jafari accuracy:** AlAdhan API supports two Shia methods — Qum (method 0) and Tehran (method 7). Tehran available as override in settings for users who prefer it.
-- **GPS permission denied:** Falls back to manual city entry. App remains fully functional.
+- **GPS permission denied or fails:** Falls back to dialog prompting manual city entry. App remains fully functional.
 
 ## Out of Scope (Future Roadmap)
 

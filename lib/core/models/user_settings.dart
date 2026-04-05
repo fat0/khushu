@@ -1,29 +1,24 @@
 enum Fiqh {
-  sunniStandard,
-  sunniHanafi,
+  sunni,
   jafari,
 }
 
 class UserSettings {
   final Fiqh fiqh;
   final int? methodId;
-  final bool? darkMode;
   final double? latitude;
   final double? longitude;
   final String? locationName;
   final bool onboardingComplete;
 
   const UserSettings({
-    this.fiqh = Fiqh.sunniStandard,
+    this.fiqh = Fiqh.sunni,
     this.methodId,
-    this.darkMode,
     this.latitude,
     this.longitude,
     this.locationName,
     this.onboardingComplete = false,
   });
-
-  int get apiSchool => fiqh == Fiqh.sunniHanafi ? 1 : 0;
 
   int get apiMethod {
     if (fiqh == Fiqh.jafari) return 0;
@@ -33,7 +28,6 @@ class UserSettings {
   UserSettings copyWith({
     Fiqh? fiqh,
     int? methodId,
-    bool? darkMode,
     double? latitude,
     double? longitude,
     String? locationName,
@@ -42,7 +36,6 @@ class UserSettings {
     return UserSettings(
       fiqh: fiqh ?? this.fiqh,
       methodId: methodId ?? this.methodId,
-      darkMode: darkMode ?? this.darkMode,
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
       locationName: locationName ?? this.locationName,
@@ -53,20 +46,24 @@ class UserSettings {
   Map<String, dynamic> toJson() => {
         'fiqh': fiqh.index,
         'methodId': methodId,
-        'darkMode': darkMode,
         'latitude': latitude,
         'longitude': longitude,
         'locationName': locationName,
         'onboardingComplete': onboardingComplete,
       };
 
-  factory UserSettings.fromJson(Map<String, dynamic> json) => UserSettings(
-        fiqh: Fiqh.values[json['fiqh'] as int? ?? 0],
-        methodId: json['methodId'] as int?,
-        darkMode: json['darkMode'] as bool?,
-        latitude: json['latitude'] as double?,
-        longitude: json['longitude'] as double?,
-        locationName: json['locationName'] as String?,
-        onboardingComplete: json['onboardingComplete'] as bool? ?? false,
-      );
+  factory UserSettings.fromJson(Map<String, dynamic> json) {
+    // Migration: old sunniStandard(0) and sunniHanafi(1) both map to sunni(0)
+    final fiqhIndex = json['fiqh'] as int? ?? 0;
+    final fiqh = fiqhIndex >= 2 ? Fiqh.jafari : Fiqh.sunni;
+
+    return UserSettings(
+      fiqh: fiqh,
+      methodId: json['methodId'] as int?,
+      latitude: json['latitude'] as double?,
+      longitude: json['longitude'] as double?,
+      locationName: json['locationName'] as String?,
+      onboardingComplete: json['onboardingComplete'] as bool? ?? false,
+    );
+  }
 }
