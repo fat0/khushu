@@ -47,29 +47,14 @@ void main() {
       expect(next.name, 'Fajr');
     });
 
-    test('combinedList returns 4 rows when combine is true', () {
+    test('toDisplayList returns 6 rows', () {
       final times = PrayerTimes(
         fajr: '05:38', sunrise: '06:52', dhuhr: '13:13',
         asr: '16:48', maghrib: '19:35', isha: '20:49',
         date: DateTime(2026, 4, 3),
       );
 
-      final combined = times.toDisplayList(combine: true);
-      expect(combined.length, 4);
-      expect(combined[0].name, 'Fajr');
-      expect(combined[1].name, 'Sunrise');
-      expect(combined[2].name, 'Dhuhr + Asr');
-      expect(combined[3].name, 'Maghrib + Isha');
-    });
-
-    test('toDisplayList returns 6 rows when combine is false', () {
-      final times = PrayerTimes(
-        fajr: '05:38', sunrise: '06:52', dhuhr: '13:13',
-        asr: '16:48', maghrib: '19:35', isha: '20:49',
-        date: DateTime(2026, 4, 3),
-      );
-
-      final list = times.toDisplayList(combine: false);
+      final list = times.toDisplayList();
       expect(list.length, 6);
     });
   });

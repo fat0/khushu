@@ -1,12 +1,10 @@
 class PrayerTimeEntry {
   final String name;
   final String time;
-  final bool isCombined;
 
   const PrayerTimeEntry({
     required this.name,
     required this.time,
-    this.isCombined = false,
   });
 }
 
@@ -41,15 +39,7 @@ class PrayerTimes {
     );
   }
 
-  List<PrayerTimeEntry> toDisplayList({required bool combine}) {
-    if (combine) {
-      return [
-        PrayerTimeEntry(name: 'Fajr', time: fajr),
-        PrayerTimeEntry(name: 'Sunrise', time: sunrise),
-        PrayerTimeEntry(name: 'Dhuhr + Asr', time: '$dhuhr - $asr', isCombined: true),
-        PrayerTimeEntry(name: 'Maghrib + Isha', time: '$maghrib - $isha', isCombined: true),
-      ];
-    }
+  List<PrayerTimeEntry> toDisplayList() {
     return [
       PrayerTimeEntry(name: 'Fajr', time: fajr),
       PrayerTimeEntry(name: 'Sunrise', time: sunrise),

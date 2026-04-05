@@ -4,19 +4,17 @@ import 'prayer_time_row.dart';
 
 class PrayerTimesList extends StatelessWidget {
   final PrayerTimes prayerTimes;
-  final bool combinePrayers;
-  final String nextPrayerName;
+  final String currentPrayerName;
 
   const PrayerTimesList({
     super.key,
     required this.prayerTimes,
-    required this.combinePrayers,
-    required this.nextPrayerName,
+    required this.currentPrayerName,
   });
 
   @override
   Widget build(BuildContext context) {
-    final entries = prayerTimes.toDisplayList(combine: combinePrayers);
+    final entries = prayerTimes.toDisplayList();
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -25,8 +23,7 @@ class PrayerTimesList extends StatelessWidget {
           return PrayerTimeRow(
             name: entry.name,
             time: entry.time,
-            isHighlighted: entry.name == nextPrayerName ||
-                (entry.isCombined && entry.name.contains(nextPrayerName)),
+            isHighlighted: entry.name == currentPrayerName,
           );
         }).toList(),
       ),

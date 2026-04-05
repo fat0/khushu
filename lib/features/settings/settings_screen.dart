@@ -16,7 +16,6 @@ class SettingsScreen extends ConsumerStatefulWidget {
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   final _cityController = TextEditingController();
-  bool _showMethodOverride = false;
 
   @override
   void dispose() {
@@ -43,7 +42,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         padding: const EdgeInsets.all(20),
         children: [
           // Fiqh
-          const _SectionHeader('Fiqh'),
+          const _SectionHeader('Fiqh (Juristic Method)'),
           const SizedBox(height: 8),
           ...Fiqh.values.map((t) => _FiqhTile(
                 fiqh: t,
@@ -51,6 +50,37 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 isDark: isDark,
                 onTap: () => ref.read(settingsProvider.notifier).setFiqh(t),
               )),
+
+          const SizedBox(height: 24),
+
+          // Calculation Method
+          const _SectionHeader('Calculation Method'),
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            decoration: BoxDecoration(
+              color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<int>(
+                value: settings.apiMethod,
+                isExpanded: true,
+                dropdownColor: isDark ? AppColors.darkSurface : AppColors.lightSurface,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: isDark ? AppColors.sage : AppColors.deepGreen,
+                ),
+                items: _methods.entries.map((e) => DropdownMenuItem<int>(
+                  value: e.key,
+                  child: Text(e.value),
+                )).toList(),
+                onChanged: (v) {
+                  if (v != null) ref.read(settingsProvider.notifier).setMethodId(v);
+                },
+              ),
+            ),
+          ),
 
           const SizedBox(height: 24),
 
@@ -108,71 +138,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               IconButton(onPressed: _searchCity, icon: const Icon(Icons.search)),
             ],
           ),
-
-          const SizedBox(height: 24),
-
-          // Combine prayers
-          const _SectionHeader('Display'),
-          const SizedBox(height: 8),
-          SwitchListTile(
-            title: Text('Combine prayers',
-                style: TextStyle(
-                    fontSize: 14,
-                    color: isDark ? AppColors.sage : AppColors.deepGreen)),
-            subtitle: Text('Show Dhuhr+Asr and Maghrib+Isha together',
-                style: TextStyle(fontSize: 12, color: isDark ? AppColors.darkSecondary : AppColors.lightSecondary)),
-            value: settings.combinePrayers,
-            activeColor: AppColors.sage,
-            onChanged: (v) =>
-                ref.read(settingsProvider.notifier).setCombinePrayers(v),
-          ),
-
-          const SizedBox(height: 16),
-
-          // Theme mode
-          const _SectionHeader('Theme'),
-          const SizedBox(height: 8),
-          ...[
-            (null, 'Follow system'),
-            (false, 'Light mode'),
-            (true, 'Dark mode'),
-          ].map((entry) => RadioListTile<bool?>(
-                title: Text(entry.$2,
-                    style: TextStyle(
-                        fontSize: 14,
-                        color: isDark ? AppColors.sage : AppColors.deepGreen)),
-                value: entry.$1,
-                groupValue: settings.darkMode,
-                activeColor: AppColors.sage,
-                onChanged: (v) =>
-                    ref.read(settingsProvider.notifier).setDarkMode(v),
-              )),
-
-          const SizedBox(height: 24),
-
-          // Advanced: method override
-          TextButton(
-            onPressed: () => setState(() => _showMethodOverride = !_showMethodOverride),
-            child: Text(
-              _showMethodOverride ? 'Hide advanced' : 'Advanced: Override calculation method',
-              style: const TextStyle(fontSize: 12, color: AppColors.sage),
-            ),
-          ),
-          if (_showMethodOverride) ...[
-            const SizedBox(height: 8),
-            ..._methods.entries.map((e) => RadioListTile<int>(
-                  title: Text(e.value,
-                      style: TextStyle(
-                          fontSize: 13,
-                          color: isDark ? AppColors.sage : AppColors.deepGreen)),
-                  value: e.key,
-                  groupValue: settings.apiMethod,
-                  activeColor: AppColors.sage,
-                  onChanged: (v) {
-                    if (v != null) ref.read(settingsProvider.notifier).setMethodId(v);
-                  },
-                )),
-          ],
         ],
       ),
     );
@@ -244,9 +209,9 @@ class _FiqhTile extends StatelessWidget {
   });
 
   String get _label => switch (fiqh) {
-        Fiqh.sunniStandard => 'Sunni (Standard Asr)',
-        Fiqh.sunniHanafi => 'Sunni (Hanafi Asr)',
-        Fiqh.jafari => 'Shia (Jafari)',
+        Fiqh.sunniStandard => 'Maliki, Hanbali, Shafi\'i',
+        Fiqh.sunniHanafi => 'Hanafi',
+        Fiqh.jafari => 'Ja\'fari',
       };
 
   @override
