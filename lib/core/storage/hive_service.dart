@@ -30,7 +30,11 @@ class HiveService {
     final key = '${date.year}-${date.month}-${date.day}';
     final json = box.get(key);
     if (json == null) return null;
-    return PrayerTimes.fromAlAdhanJson(Map<String, dynamic>.from(json), date);
+    final map = Map<String, dynamic>.from(json);
+    final times = PrayerTimes.fromAlAdhanJson(map, date);
+    final asrHanafi = map['AsrHanafi'] as String?;
+    if (asrHanafi != null) return times.withHanafiAsr(asrHanafi);
+    return times;
   }
 
   static Future<void> clearPrayerCache() async {
@@ -46,6 +50,7 @@ class HiveService {
       'Sunrise': times.sunrise,
       'Dhuhr': times.dhuhr,
       'Asr': times.asr,
+      if (times.asrHanafi != null) 'AsrHanafi': times.asrHanafi,
       'Maghrib': times.maghrib,
       'Isha': times.isha,
     });

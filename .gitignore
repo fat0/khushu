@@ -8,3 +8,14 @@
 build/
 android/app/.cxx/
 .gradle/
+
+# Secrets & credentials — never commit these
+.env
+.env.*
+*.pem
+*.key
+*.keystore
+*.jks
+android/key.properties
+google-services.json
+GoogleService-Info.plist

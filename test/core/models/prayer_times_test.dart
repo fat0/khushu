@@ -47,7 +47,7 @@ void main() {
       expect(next.name, 'Fajr');
     });
 
-    test('toDisplayList returns 6 rows', () {
+    test('toDisplayList returns 6 rows always', () {
       final times = PrayerTimes(
         fajr: '05:38', sunrise: '06:52', dhuhr: '13:13',
         asr: '16:48', maghrib: '19:35', isha: '20:49',
@@ -56,6 +56,24 @@ void main() {
 
       final list = times.toDisplayList();
       expect(list.length, 6);
+      expect(list[3].name, 'Asr');
+      expect(list[3].hasDualTime, false);
+    });
+
+    test('toDisplayList Asr has dual time with Hanafi', () {
+      final times = PrayerTimes(
+        fajr: '05:38', sunrise: '06:52', dhuhr: '13:13',
+        asr: '16:48', maghrib: '19:35', isha: '20:49',
+        date: DateTime(2026, 4, 3),
+      ).withHanafiAsr('17:45');
+
+      final list = times.toDisplayList();
+      expect(list.length, 6);
+      expect(list[3].name, 'Asr');
+      expect(list[3].time, '16:48');
+      expect(list[3].hasDualTime, true);
+      expect(list[3].secondaryName, 'Asr (Hanafi)');
+      expect(list[3].secondaryTime, '17:45');
     });
   });
 }

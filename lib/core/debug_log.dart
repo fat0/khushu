@@ -19,6 +19,8 @@ class DebugLog {
   static void storage(String message) => _logger.d('[STORAGE] $message');
   static void nav(String message) => _logger.d('[NAV] $message');
 
+  static void info(String message) => _logger.i(message);
+
   static void gpsWarning(String message) => _logger.w('[GPS] $message');
   static void apiWarning(String message) => _logger.w('[API] $message');
 
