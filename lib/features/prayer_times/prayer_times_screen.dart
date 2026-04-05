@@ -114,6 +114,7 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen> {
             final currentPrayer = times.currentPrayer(now);
             final nextPrayer = times.nextPrayer(now);
             final dateStr = DateFormat('EEEE, MMMM d, yyyy').format(now);
+            DebugLog.info('asrHanafi=${times.asrHanafi}');
 
             return SingleChildScrollView(
               padding: const EdgeInsets.only(bottom: 24),
@@ -145,6 +146,7 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen> {
                   PrayerTimesList(
                     prayerTimes: times,
                     currentPrayerName: currentPrayer.name,
+                    fiqh: settings.fiqh,
                   ),
                 ],
               ),
