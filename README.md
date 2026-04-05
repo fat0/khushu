@@ -2,18 +2,15 @@
 
 **One Ummah Serving Allah**
 
-A learner-friendly Islamic prayer app with a clean, simple interface to help you wherever you are in your salat learning journey.
+An Islamic prayer app with a clean, simple interface to help you wherever you are in your salat journey.
 
 ## Features
 
-- **Accurate prayer times** for both Sunni and Shia fiqhs via the [AlAdhan API](https://aladhan.com)
-- **Dual Asr times** — shows both standard (Maliki, Hanbali, Shafi'i) and Hanafi calculations
-- **Prayer guide** — tap any prayer to see rakat breakdown (fard, sunnah/nafilah, witr) for your fiqh
-- **Fiqh-aware terminology** — "Sunnah" for Sunni, "Nafilah" for Ja'fari
+- **Accurate prayer times** for Sunni and Shia fiqhs via the [AlAdhan API](https://aladhan.com)
+- **Prayer guide** — tap any prayer to see rakat breakdown for your fiqh
 - **Auto-detect location** — GPS with manual city fallback
-- **Regional calculation methods** — auto-selects ISNA, MWL, Umm Al-Qura, etc. based on your location
+- **Regional calculation methods** — auto-selects based on your location
 - **Light & dark mode** — follows your system theme
-- **Calm, minimal design** — Garden of Peace color palette
 
 ## Supported Fiqhs
 
