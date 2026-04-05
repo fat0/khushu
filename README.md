@@ -12,15 +12,6 @@ An Islamic prayer app with a clean, simple interface to help you wherever you ar
 - **Regional calculation methods** — auto-selects based on your location
 - **Light & dark mode** — follows your system theme
 
-## Supported Fiqhs
-
-| Fiqh | Prayer Times | Rakat Guide |
-|------|-------------|-------------|
-| Sunni (Maliki, Hanafi, Hanbali, Shafi'i) | Dual Asr times | Sunnah + Fard + Witr |
-| Shia (Ja'fari) | Qum calculation | Nafilah + Fard |
-
-Ja'fari rakat data verified against Ayatollah Sistani's *Tawdih al-Masa'il* (Ruling 751). See [docs/fiqh-sources.md](docs/fiqh-sources.md) for all sources.
-
 ## Tech
 
 - **Flutter** (Dart) — cross-platform Android & iOS
