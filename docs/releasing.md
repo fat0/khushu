@@ -40,15 +40,17 @@ When the version in `pubspec.yaml` changes on main, GitHub Actions automatically
 - Builds a signed AAB (Android App Bundle)
 - Creates a GitHub Release with the AAB attached
 
-### 5. Upload to Play Store
+### 5. Deploy to Play Store
 
+Once Fastlane is set up (pending Google identity verification), the release workflow will automatically upload the AAB to the Play Store.
+
+Until then, manually upload:
 1. Go to [Google Play Console](https://play.google.com/console)
-2. Select Khushu
-3. Go to **Production** (or **Internal testing** for beta)
-4. Click **Create new release**
-5. Download the AAB from the GitHub Release and upload it
-6. Add release notes (copy from CHANGELOG.md)
-7. Click **Review release** → **Start rollout**
+2. Select Khushu → **Production** (or **Internal testing**)
+3. Click **Create new release**
+4. Download the AAB from the GitHub Release and upload it
+5. Add release notes (copy from CHANGELOG.md)
+6. Click **Review release** → **Start rollout**
 
 ## First-Time Setup (already done)
 
