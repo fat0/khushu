@@ -21,4 +21,5 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versioning follo
 - Garden of Peace color palette (light + dark mode, follows system)
 - App icon — dome + crescent on deep green
 - Privacy policy page
-- GitHub Actions CI (tests on every PR) and release workflow (signed AAB on tag)
+- GitHub Actions CI (tests on every PR) and release workflow (signed AAB on version bump)
+- App ID: dev.khushu
