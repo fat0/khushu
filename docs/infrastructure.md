@@ -5,12 +5,12 @@
 | Account | Purpose | URL | Owner |
 |---------|---------|-----|-------|
 | Google Play Console | App publishing | https://play.google.com/console | Separate Google account for Khushu |
-| GitHub (fat0) | Source code, CI/CD, GitHub Pages | https://github.com/fat0/khushu | Fatima |
+| GitHub | Source code, CI/CD, GitHub Pages | https://github.com/fat0/khushu | Project owner |
 | Google Cloud (pending) | Service account for automated Play Store deployment | https://console.cloud.google.com | Same as Play Console account |
 
 ## GitHub Tokens
 
-Fatima uses **separate tokens** for git and gh CLI. Never merge them.
+**Separate tokens** are used for git and gh CLI. Never merge them.
 
 | Token | Type | Storage | Scope |
 |-------|------|---------|-------|
@@ -36,7 +36,7 @@ https://github.com/fat0/khushu/settings/secrets/actions
 |------|----------|-------|
 | Keystore file | `~/khushu-release.jks` | **BACK THIS UP** — if lost, cannot update app on Play Store |
 | Key alias | `khushu` | Hardcoded in `android/app/build.gradle` |
-| Certificate | CN=Fatima Mojaddidy | Other fields left as Unknown (not visible to users) |
+| Certificate | Set during keytool generation | Other fields left as Unknown (not visible to users) |
 | Validity | 10,000 days (~27 years) | |
 
 **Backup the keystore** to a secure cloud location (iCloud Drive, Google Drive, etc.) and store the password in a password manager.
