@@ -43,6 +43,8 @@ dependencies:
   logger: ^2.5.0
 
   flutter_launcher_icons: ^0.14.3
+  timezone: ^0.10.1
+  lat_lng_to_timezone: ^0.2.0
 
 dev_dependencies:
   flutter_test:

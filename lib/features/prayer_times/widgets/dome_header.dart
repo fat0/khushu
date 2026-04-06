@@ -1,35 +1,80 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart';
+import 'package:lat_lng_to_timezone/lat_lng_to_timezone.dart' as tzmap;
+import 'package:timezone/timezone.dart' as tz;
 import '../../../core/theme/app_colors.dart';
 
 /// Dome header sizing and text position documented in docs/dome-header-spec.md
-/// Text at 53% from top, date line aligns with dome bottom edge.
-class DomeHeader extends StatelessWidget {
+/// Text at 65% from top, date line aligns with dome bottom edge.
+class DomeHeader extends StatefulWidget {
   final String locationName;
-  final String date;
+  final double? latitude;
+  final double? longitude;
 
   const DomeHeader({
     super.key,
     required this.locationName,
-    required this.date,
+    this.latitude,
+    this.longitude,
   });
+
+  @override
+  State<DomeHeader> createState() => _DomeHeaderState();
+}
+
+class _DomeHeaderState extends State<DomeHeader> {
+  late Timer _timer;
+  DateTime _now = DateTime.now();
+
+  @override
+  void initState() {
+    super.initState();
+    _updateTime();
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) => _updateTime());
+  }
+
+  void _updateTime() {
+    if (widget.latitude != null && widget.longitude != null) {
+      try {
+        final tzName = tzmap.latLngToTimezoneString(
+          widget.latitude!,
+          widget.longitude!,
+        );
+        final location = tz.getLocation(tzName);
+        setState(() => _now = tz.TZDateTime.now(location));
+        return;
+      } catch (_) {
+        // Fall back to device time
+      }
+    }
+    setState(() => _now = DateTime.now());
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textColor = isDark ? AppColors.sage : AppColors.deepGreen;
-    final secondaryColor = isDark ? AppColors.darkSecondary : AppColors.lightSecondary;
+    final secondaryColor = isDark ? AppColors.sage.withValues(alpha: 0.7) : AppColors.deepGreen.withValues(alpha: 0.7);
     final svgColor = isDark
         ? AppColors.sage.withValues(alpha: 0.32)
         : AppColors.deepGreen.withValues(alpha: 0.45);
 
     final screenWidth = MediaQuery.of(context).size.width;
-    // Scale SVG 1.5x wider than screen for proper dome size
     final svgDisplayWidth = screenWidth * 1.5;
     final svgDisplayHeight = svgDisplayWidth / 1.5;
-    // Crop top 15% and bottom 25% — SVG has empty space above and below dome
     final containerHeight = svgDisplayHeight * 0.60;
     final textTop = containerHeight * 0.65;
+
+    final timeStr = DateFormat('h:mm a').format(_now);
+    final dateStr = DateFormat('EEE, MMM d').format(_now);
 
     return SizedBox(
       height: containerHeight,
@@ -39,7 +84,6 @@ class DomeHeader extends StatelessWidget {
         clipBehavior: Clip.none,
         alignment: Alignment.topCenter,
         children: [
-          // Dome SVG — wider than screen, centered, top and bottom cropped
           Positioned(
             top: -svgDisplayHeight * 0.15,
             left: -(svgDisplayWidth - screenWidth) / 2,
@@ -51,7 +95,6 @@ class DomeHeader extends StatelessWidget {
               colorFilter: ColorFilter.mode(svgColor, BlendMode.srcIn),
             ),
           ),
-          // Text overlay — positioned at 53% from top (inside dome belly)
           Positioned(
             top: textTop,
             left: 0,
@@ -69,16 +112,16 @@ class DomeHeader extends StatelessWidget {
                   ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 6),
                 Text(
-                  locationName,
+                  widget.locationName,
                   style: TextStyle(fontSize: 14, color: secondaryColor),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 5),
+                const SizedBox(height: 4),
                 Text(
-                  date,
-                  style: const TextStyle(fontSize: 13, color: AppColors.sage),
+                  '$dateStr  ·  $timeStr',
+                  style: TextStyle(fontSize: 13, color: isDark ? AppColors.sage : AppColors.deepGreen.withValues(alpha: 0.6)),
                   textAlign: TextAlign.center,
                 ),
               ],

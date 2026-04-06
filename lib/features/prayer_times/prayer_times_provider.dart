@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/api/aladhan_api.dart';
 import '../../core/debug_log.dart';
+import '../../core/location/timezone_util.dart';
 import '../../core/models/prayer_times.dart';
 import '../../core/models/user_settings.dart';
 import '../../core/storage/hive_service.dart';
@@ -86,11 +87,14 @@ class PrayerTimesNotifier extends AsyncNotifier<PrayerTimes> {
 // Countdown timer that ticks every second
 final countdownProvider = StreamProvider<Duration>((ref) {
   final timesAsync = ref.watch(prayerTimesProvider);
+  final settings = ref.watch(settingsProvider);
 
   return timesAsync.when(
     data: (times) {
       return Stream.periodic(const Duration(seconds: 1), (_) {
-        final now = DateTime.now();
+        final now = (settings.latitude != null && settings.longitude != null)
+            ? TimezoneUtil.nowAt(settings.latitude!, settings.longitude!)
+            : DateTime.now();
         final next = times.nextPrayer(now);
         final parts = next.time.split(':');
         var targetHour = int.parse(parts[0]);

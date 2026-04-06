@@ -76,8 +76,20 @@ class PrayerTimes {
     ];
   }
 
-  /// Returns the current prayer (the most recent prayer that has started)
-  PrayerTimeEntry currentPrayer(DateTime now) {
+  /// Returns the current prayer (the most recent prayer that has started).
+  /// Returns null between Sunrise and Dhuhr (no active prayer).
+  PrayerTimeEntry? currentPrayer(DateTime now) {
+    final nowMinutes = now.hour * 60 + now.minute;
+
+    // Check if we're between Sunrise and Dhuhr — no active prayer
+    final sunriseParts = sunrise.split(':');
+    final sunriseMinutes = int.parse(sunriseParts[0]) * 60 + int.parse(sunriseParts[1]);
+    final dhuhrParts = dhuhr.split(':');
+    final dhuhrMinutes = int.parse(dhuhrParts[0]) * 60 + int.parse(dhuhrParts[1]);
+    if (nowMinutes >= sunriseMinutes && nowMinutes < dhuhrMinutes) {
+      return null;
+    }
+
     final prayers = [
       PrayerTimeEntry(name: 'Fajr', time: fajr),
       PrayerTimeEntry(name: 'Dhuhr', time: dhuhr),
@@ -86,7 +98,6 @@ class PrayerTimes {
       PrayerTimeEntry(name: 'Isha', time: isha),
     ];
 
-    final nowMinutes = now.hour * 60 + now.minute;
     PrayerTimeEntry current = prayers.last; // default to Isha
 
     for (final entry in prayers) {
