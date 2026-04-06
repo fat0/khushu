@@ -36,6 +36,22 @@ void main() {
       expect(next.time, '16:48');
     });
 
+    test('currentPrayer returns null between Sunrise and Dhuhr', () {
+      final times = PrayerTimes(
+        fajr: '05:38', sunrise: '06:52', dhuhr: '13:13',
+        asr: '16:48', maghrib: '19:35', isha: '20:49',
+        date: DateTime(2026, 4, 3),
+      );
+
+      // During Fajr — should return Fajr
+      expect(times.currentPrayer(DateTime(2026, 4, 3, 6, 0))?.name, 'Fajr');
+      // After Sunrise, before Dhuhr — no active prayer
+      expect(times.currentPrayer(DateTime(2026, 4, 3, 7, 0)), isNull);
+      expect(times.currentPrayer(DateTime(2026, 4, 3, 12, 0)), isNull);
+      // At Dhuhr — should return Dhuhr
+      expect(times.currentPrayer(DateTime(2026, 4, 3, 13, 13))?.name, 'Dhuhr');
+    });
+
     test('nextPrayer returns Fajr when after Isha', () {
       final times = PrayerTimes(
         fajr: '05:38', sunrise: '06:52', dhuhr: '13:13',
