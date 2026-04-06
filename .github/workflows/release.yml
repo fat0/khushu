@@ -23,13 +23,21 @@ jobs:
         run: |
           # Get latest version from CHANGELOG.md (first ## [x.y.z] line)
           CHANGELOG_VERSION=$(grep -m1 '^\## \[' CHANGELOG.md | sed 's/.*\[\(.*\)\].*/\1/')
+
+          # Validate semver format (x.y.z)
+          if ! echo "$CHANGELOG_VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::Invalid version in CHANGELOG.md: '$CHANGELOG_VERSION' — must be semver (e.g., 1.2.3)"
+            echo "changed=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
           PUBSPEC_VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}' | cut -d'+' -f1)
           CURRENT_BUILD=$(grep '^version:' pubspec.yaml | awk '{print $2}' | cut -d'+' -f2)
           NEW_BUILD=$((CURRENT_BUILD + 1))
 
           echo "changelog=$CHANGELOG_VERSION pubspec=$PUBSPEC_VERSION build=$NEW_BUILD"
 
-          if [ "$CHANGELOG_VERSION" != "$PUBSPEC_VERSION" ] && [ -n "$CHANGELOG_VERSION" ]; then
+          if [ "$CHANGELOG_VERSION" != "$PUBSPEC_VERSION" ]; then
             echo "changed=true" >> $GITHUB_OUTPUT
             echo "version=$CHANGELOG_VERSION" >> $GITHUB_OUTPUT
             echo "build_number=$NEW_BUILD" >> $GITHUB_OUTPUT
