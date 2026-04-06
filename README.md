@@ -4,6 +4,12 @@
 
 An Islamic prayer app with a clean, simple interface to help you wherever you are in your salat journey.
 
+<p align="center">
+  <img src="docs/store-listing/screenshot-light.png" width="280" alt="Light mode" />
+  &nbsp;&nbsp;
+  <img src="docs/store-listing/screenshot-dark.png" width="280" alt="Dark mode" />
+</p>
+
 ## Features
 
 - **Accurate prayer times** for Sunni and Shia fiqhs via the [AlAdhan API](https://aladhan.com)
