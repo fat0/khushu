@@ -14,8 +14,8 @@
 
 | Token | Type | Storage | Scope |
 |-------|------|---------|-------|
-| Git push token | Fine-grained PAT | macOS Keychain | khushu repo only — Contents + Workflows (read/write) |
-| gh CLI token | Fine-grained PAT | macOS Keychain (via gh) | khushu repo only |
+| Git push token | Fine-grained PAT | macOS Keychain | See token settings on GitHub |
+| gh CLI token | Fine-grained PAT | macOS Keychain (via gh) | See token settings on GitHub |
 
 **Important:** When editing token permissions on GitHub, the repo scope can silently reset to "All repositories" — always double-check after saving.
 
