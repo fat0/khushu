@@ -1,0 +1,97 @@
+name: Release Build
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'CHANGELOG.md'
+
+jobs:
+  check-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version_changed: ${{ steps.check.outputs.changed }}
+      version: ${{ steps.check.outputs.version }}
+      build_number: ${{ steps.check.outputs.build_number }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Extract version from CHANGELOG.md
+        id: check
+        run: |
+          # Get latest version from CHANGELOG.md (first ## [x.y.z] line)
+          CHANGELOG_VERSION=$(grep -m1 '^\## \[' CHANGELOG.md | sed 's/.*\[\(.*\)\].*/\1/')
+
+          # Validate semver format (x.y.z)
+          if ! echo "$CHANGELOG_VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::Invalid version in CHANGELOG.md: '$CHANGELOG_VERSION' — must be semver (e.g., 1.2.3)"
+            echo "changed=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          PUBSPEC_VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}' | cut -d'+' -f1)
+          CURRENT_BUILD=$(grep '^version:' pubspec.yaml | awk '{print $2}' | cut -d'+' -f2)
+          NEW_BUILD=$((CURRENT_BUILD + 1))
+
+          echo "changelog=$CHANGELOG_VERSION pubspec=$PUBSPEC_VERSION build=$NEW_BUILD"
+
+          if [ "$CHANGELOG_VERSION" != "$PUBSPEC_VERSION" ]; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "version=$CHANGELOG_VERSION" >> $GITHUB_OUTPUT
+            echo "build_number=$NEW_BUILD" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
+  build:
+    needs: check-version
+    if: needs.check-version.outputs.version_changed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.29.3'
+
+      - name: Sync version to pubspec.yaml
+        run: |
+          VERSION="${{ needs.check-version.outputs.version }}"
+          BUILD="${{ needs.check-version.outputs.build_number }}"
+          sed -i "s/^version: .*/version: ${VERSION}+${BUILD}/" pubspec.yaml
+          echo "Updated pubspec.yaml to ${VERSION}+${BUILD}"
+
+      - run: flutter pub get
+
+      - run: flutter test
+
+      - name: Decode keystore
+        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > /tmp/khushu-release.jks
+
+      - name: Build signed AAB
+        env:
+          KEYSTORE_PATH: /tmp/khushu-release.jks
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: flutter build appbundle --release
+
+      - name: Upload AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: khushu-v${{ needs.check-version.outputs.version }}
+          path: build/app/outputs/bundle/release/app-release.aab
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "v${{ needs.check-version.outputs.version }}" \
+            --title "Khushu v${{ needs.check-version.outputs.version }}" \
+            --notes-file CHANGELOG.md \
+            build/app/outputs/bundle/release/app-release.aab
+
+      - name: Clean up keystore
+        if: always()
+        run: rm -f /tmp/khushu-release.jks
