@@ -64,7 +64,7 @@ class PrayerTimeRow extends StatelessWidget {
                       Text(
                         entry.name,
                         style: TextStyle(
-                          fontSize: 13,
+                          fontSize: 16,
                           fontWeight: isHighlighted ? FontWeight.w600 : FontWeight.w400,
                           color: nameColor,
                         ),
@@ -86,7 +86,7 @@ class PrayerTimeRow extends StatelessWidget {
                   Text(
                     entry.time,
                     style: TextStyle(
-                      fontSize: 13,
+                      fontSize: 16,
                       fontWeight: FontWeight.w600,
                       color: timeColor,
                     ),
@@ -104,7 +104,7 @@ class PrayerTimeRow extends StatelessWidget {
                     Text(
                       entry.secondaryName!,
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: 14,
                         fontWeight: FontWeight.w400,
                         color: secondaryColor,
                       ),
@@ -112,7 +112,7 @@ class PrayerTimeRow extends StatelessWidget {
                     Text(
                       entry.secondaryTime!,
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: 14,
                         fontWeight: FontWeight.w600,
                         color: secondaryColor,
                       ),
@@ -147,7 +147,7 @@ class PrayerTimeRow extends StatelessWidget {
         child: Text(
           RakatInfo.sunriseNote,
           style: TextStyle(
-            fontSize: 12,
+            fontSize: 14,
             fontStyle: FontStyle.italic,
             color: detailColor,
           ),
@@ -164,7 +164,7 @@ class PrayerTimeRow extends StatelessWidget {
           child: Text(
             r.display,
             style: TextStyle(
-              fontSize: 12,
+              fontSize: 14,
               fontWeight: FontWeight.w400,
               color: detailColor,
             ),

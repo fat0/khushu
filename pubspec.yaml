@@ -42,6 +42,8 @@ dependencies:
   intl: ^0.19.0
   logger: ^2.5.0
 
+  flutter_launcher_icons: ^0.14.3
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -97,3 +99,10 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/icon.png"
+  adaptive_icon_background: "#3D5A3A"
+  adaptive_icon_foreground: "assets/images/icon.png"
