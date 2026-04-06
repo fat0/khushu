@@ -1,0 +1,40 @@
+name: Release Build
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.29.3'
+
+      - run: flutter pub get
+
+      - run: flutter test
+
+      - name: Decode keystore
+        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > /tmp/khushu-release.jks
+
+      - name: Build signed AAB
+        env:
+          KEYSTORE_PATH: /tmp/khushu-release.jks
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: flutter build appbundle --release
+
+      - name: Upload AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: khushu-release-aab
+          path: build/app/outputs/bundle/release/app-release.aab
+
+      - name: Clean up keystore
+        if: always()
+        run: rm -f /tmp/khushu-release.jks
