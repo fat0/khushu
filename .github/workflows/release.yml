@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'pubspec.yaml'
+      - 'CHANGELOG.md'
 
 jobs:
   check-version:
@@ -12,20 +12,27 @@ jobs:
     outputs:
       version_changed: ${{ steps.check.outputs.changed }}
       version: ${{ steps.check.outputs.version }}
+      build_number: ${{ steps.check.outputs.build_number }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 2
 
-      - name: Check if version changed
+      - name: Extract version from CHANGELOG.md
         id: check
         run: |
-          CURRENT=$(grep '^version:' pubspec.yaml | awk '{print $2}' | cut -d'+' -f1)
-          PREVIOUS=$(git show HEAD~1:pubspec.yaml 2>/dev/null | grep '^version:' | awk '{print $2}' | cut -d'+' -f1 || echo "")
-          echo "current=$CURRENT previous=$PREVIOUS"
-          if [ "$CURRENT" != "$PREVIOUS" ]; then
+          # Get latest version from CHANGELOG.md (first ## [x.y.z] line)
+          CHANGELOG_VERSION=$(grep -m1 '^\## \[' CHANGELOG.md | sed 's/.*\[\(.*\)\].*/\1/')
+          PUBSPEC_VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}' | cut -d'+' -f1)
+          CURRENT_BUILD=$(grep '^version:' pubspec.yaml | awk '{print $2}' | cut -d'+' -f2)
+          NEW_BUILD=$((CURRENT_BUILD + 1))
+
+          echo "changelog=$CHANGELOG_VERSION pubspec=$PUBSPEC_VERSION build=$NEW_BUILD"
+
+          if [ "$CHANGELOG_VERSION" != "$PUBSPEC_VERSION" ] && [ -n "$CHANGELOG_VERSION" ]; then
             echo "changed=true" >> $GITHUB_OUTPUT
-            echo "version=$CURRENT" >> $GITHUB_OUTPUT
+            echo "version=$CHANGELOG_VERSION" >> $GITHUB_OUTPUT
+            echo "build_number=$NEW_BUILD" >> $GITHUB_OUTPUT
           else
             echo "changed=false" >> $GITHUB_OUTPUT
           fi
@@ -40,6 +47,13 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.29.3'
+
+      - name: Sync version to pubspec.yaml
+        run: |
+          VERSION="${{ needs.check-version.outputs.version }}"
+          BUILD="${{ needs.check-version.outputs.build_number }}"
+          sed -i "s/^version: .*/version: ${VERSION}+${BUILD}/" pubspec.yaml
+          echo "Updated pubspec.yaml to ${VERSION}+${BUILD}"
 
       - run: flutter pub get
 

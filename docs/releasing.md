@@ -2,22 +2,9 @@
 
 ## How to Release a New Version
 
-### 1. Update the version
+### 1. Update the changelog (single source of truth)
 
-In `pubspec.yaml`, bump the version:
-
-```yaml
-version: 1.1.0+2
-```
-
-- **First number** (major): breaking changes
-- **Second number** (minor): new features
-- **Third number** (patch): bug fixes
-- **+N** (build number): must increment every release — Play Store requires this to go up
-
-### 2. Update the changelog
-
-Add a new section at the top of `CHANGELOG.md`:
+Add a new section at the top of `CHANGELOG.md` with the new version number:
 
 ```markdown
 ## [1.1.0] — 2026-05-01
@@ -29,13 +16,20 @@ Add a new section at the top of `CHANGELOG.md`:
 - Bug fix description
 ```
 
-### 3. Commit and merge to main
+Version format: **major.minor.patch** ([semver](https://semver.org/))
+- **Major:** breaking changes
+- **Minor:** new features
+- **Patch:** bug fixes
 
-Create a PR with the version bump and changelog update. Merge to main.
+Do **not** edit `pubspec.yaml` version — GHA syncs it automatically from CHANGELOG.md.
 
-### 4. Automated build
+### 2. Commit and merge to main
 
-When the version in `pubspec.yaml` changes on main, GitHub Actions automatically:
+Create a PR with the changelog update. Merge to main.
+
+### 3. Automated build
+
+When the version in `CHANGELOG.md` changes on main, GitHub Actions automatically:
 - Runs all tests
 - Builds a signed AAB (Android App Bundle)
 - Creates a GitHub Release with the AAB attached
