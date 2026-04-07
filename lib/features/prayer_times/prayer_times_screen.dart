@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import '../../core/debug_log.dart';
 import '../../core/location/location_service.dart';
 import '../../core/location/region_detector.dart';
+import '../../core/location/timezone_util.dart';
 import '../../core/theme/app_colors.dart';
 import '../settings/settings_provider.dart';
 import 'prayer_times_provider.dart';
@@ -110,11 +110,12 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen> {
             ),
           ),
           data: (times) {
-            final now = DateTime.now();
+            final now = (settings.latitude != null && settings.longitude != null)
+                ? TimezoneUtil.nowAt(settings.latitude!, settings.longitude!)
+                : DateTime.now();
             final currentPrayer = times.currentPrayer(now);
             final nextPrayer = times.nextPrayer(now);
-            final dateStr = DateFormat('EEEE, MMMM d, yyyy').format(now);
-            DebugLog.info('asrHanafi=${times.asrHanafi}');
+            final currentName = currentPrayer?.name ?? '';
 
             return SingleChildScrollView(
               padding: const EdgeInsets.only(bottom: 24),
@@ -122,22 +123,23 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen> {
                 children: [
                   DomeHeader(
                     locationName: settings.locationName ?? 'Unknown',
-                    date: dateStr,
+                    latitude: settings.latitude,
+                    longitude: settings.longitude,
                   ),
                   const SizedBox(height: 8),
                   countdownAsync.when(
                     data: (countdown) => NextPrayerCard(
-                      currentPrayerName: currentPrayer.name,
+                      currentPrayerName: currentName,
                       nextPrayerName: nextPrayer.name,
                       countdown: countdown,
                     ),
                     loading: () => NextPrayerCard(
-                      currentPrayerName: currentPrayer.name,
+                      currentPrayerName: currentName,
                       nextPrayerName: nextPrayer.name,
                       countdown: Duration.zero,
                     ),
                     error: (_, __) => NextPrayerCard(
-                      currentPrayerName: currentPrayer.name,
+                      currentPrayerName: currentName,
                       nextPrayerName: nextPrayer.name,
                       countdown: Duration.zero,
                     ),
@@ -145,7 +147,7 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen> {
                   const SizedBox(height: 16),
                   PrayerTimesList(
                     prayerTimes: times,
-                    currentPrayerName: currentPrayer.name,
+                    currentPrayerName: currentName,
                     fiqh: settings.fiqh,
                   ),
                 ],

@@ -39,33 +39,44 @@ class NextPrayerCard extends StatelessWidget {
         ),
         borderRadius: BorderRadius.circular(16),
       ),
-      child: Row(
-        children: [
-          Text(
-            currentPrayerName,
-            style: const TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.w300,
-              color: AppColors.cream,
-            ),
-          ),
-          const Spacer(),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
+      child: currentPrayerName.isEmpty
+          ? Center(
+              child: Text(
                 '${_formatCountdown(countdown)} to $nextPrayerName',
                 style: const TextStyle(
-                  fontSize: 13,
+                  fontSize: 16,
                   fontWeight: FontWeight.w500,
                   color: AppColors.sage,
                 ),
               ),
-            ],
-          ),
-        ],
-      ),
+            )
+          : Row(
+              children: [
+                Text(
+                  currentPrayerName,
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w300,
+                    color: AppColors.cream,
+                  ),
+                ),
+                const Spacer(),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      '${_formatCountdown(countdown)} to $nextPrayerName',
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.sage,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
     );
   }
 }
