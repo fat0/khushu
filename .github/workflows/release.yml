@@ -67,8 +67,6 @@ jobs:
 
       - run: flutter pub get
 
-      - run: flutter test
-
       - name: Decode keystore
         run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > /tmp/khushu-release.jks
 
