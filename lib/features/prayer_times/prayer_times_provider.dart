@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/api/aladhan_api.dart';
 import '../../core/debug_log.dart';
+import '../../core/notifications/notification_service.dart';
 import '../../core/location/timezone_util.dart';
 import '../../core/models/prayer_times.dart';
 import '../../core/models/user_settings.dart';
@@ -32,6 +33,7 @@ class PrayerTimesNotifier extends AsyncNotifier<PrayerTimes> {
       final sunniValid = settings.fiqh == Fiqh.sunni && cached.asrHanafi != null;
       final jafariValid = settings.fiqh == Fiqh.jafari && cached.asrHanafi == null;
       if (sunniValid || jafariValid) {
+        NotificationService.scheduleAllPrayers(times: cached, settings: settings);
         return cached;
       }
       DebugLog.info('Cache mismatch for ${settings.fiqh}, refetching...');
@@ -42,6 +44,7 @@ class PrayerTimesNotifier extends AsyncNotifier<PrayerTimes> {
 
     // Cache for today
     await HiveService.cachePrayerTimes(times);
+    NotificationService.scheduleAllPrayers(times: times, settings: settings);
     return times;
   }
 
@@ -79,6 +82,7 @@ class PrayerTimesNotifier extends AsyncNotifier<PrayerTimes> {
     state = await AsyncValue.guard(() async {
       final times = await _fetchTimes(settings, DateTime.now());
       await HiveService.cachePrayerTimes(times);
+      NotificationService.scheduleAllPrayers(times: times, settings: settings);
       return times;
     });
   }

@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../core/models/notification_type.dart';
 import '../../core/models/user_settings.dart';
 import '../../core/storage/hive_service.dart';
 
@@ -24,6 +25,18 @@ class SettingsNotifier extends StateNotifier<UserSettings> {
 
   Future<void> completeOnboarding() async {
     state = state.copyWith(onboardingComplete: true);
+    await HiveService.saveSettings(state);
+  }
+
+  Future<void> setNotificationType(String prayerName, NotificationType type) async {
+    final updated = Map<String, NotificationType>.from(state.notificationTypes);
+    updated[prayerName] = type;
+    state = state.copyWith(notificationTypes: updated);
+    await HiveService.saveSettings(state);
+  }
+
+  Future<void> setSoundPreference(SoundPreference pref) async {
+    state = state.copyWith(soundPreference: pref);
     await HiveService.saveSettings(state);
   }
 }
