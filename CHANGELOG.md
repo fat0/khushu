@@ -4,6 +4,12 @@ All notable changes to Khushu will be documented in this file.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/). Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [1.0.3] — 2026-04-07
+
+### Fixed
+- Grant write permissions for GitHub Release creation
+- Skip tests on docs-only PRs
+
 ## [1.0.2] — 2026-04-07
 
 ### Fixed
