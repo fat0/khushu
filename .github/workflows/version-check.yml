@@ -1,0 +1,32 @@
+name: Version Check
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'VERSION'
+      - 'CHANGELOG.md'
+
+jobs:
+  check-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate VERSION and CHANGELOG are in sync
+        run: |
+          VERSION=$(cat VERSION | tr -d '[:space:]')
+
+          if ! echo "$VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::Invalid version in VERSION file: '$VERSION' — must be semver (e.g., 1.2.3)"
+            exit 1
+          fi
+
+          CHANGELOG_VERSION=$(grep -m1 '^\## \[' CHANGELOG.md | sed 's/.*\[\(.*\)\].*/\1/')
+
+          if [ "$VERSION" != "$CHANGELOG_VERSION" ]; then
+            echo "::error::VERSION file ($VERSION) does not match CHANGELOG.md ($CHANGELOG_VERSION)"
+            exit 1
+          fi
+
+          echo "VERSION ($VERSION) and CHANGELOG.md ($CHANGELOG_VERSION) are in sync"
