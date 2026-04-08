@@ -3,6 +3,12 @@ name: Tests
 on:
   pull_request:
     branches: [main]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.github/**'
+      - 'openspec/**'
+      - 'image_ref/**'
 
 jobs:
   test:
