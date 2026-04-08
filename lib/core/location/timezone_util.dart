@@ -11,4 +11,17 @@ class TimezoneUtil {
       return DateTime.now();
     }
   }
+
+  /// Create a DateTime for a specific hour:minute in the location's timezone
+  static DateTime timeAt(double latitude, double longitude, int hour, int minute) {
+    try {
+      final tzName = tzmap.latLngToTimezoneString(latitude, longitude);
+      final location = tz.getLocation(tzName);
+      final now = tz.TZDateTime.now(location);
+      return tz.TZDateTime(location, now.year, now.month, now.day, hour, minute);
+    } catch (_) {
+      final now = DateTime.now();
+      return DateTime(now.year, now.month, now.day, hour, minute);
+    }
+  }
 }
