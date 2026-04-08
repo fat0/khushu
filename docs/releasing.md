@@ -2,10 +2,16 @@
 
 ## How to Release a New Version
 
-### 1. Update the changelog (single source of truth)
+### 1. Update VERSION and CHANGELOG.md
 
-Add a new section at the top of `CHANGELOG.md` with the new version number:
+Update both files in the same PR:
 
+**VERSION** — set to the new version number:
+```
+1.1.0
+```
+
+**CHANGELOG.md** — add a new section at the top with the same version:
 ```markdown
 ## [1.1.0] — 2026-05-01
 
@@ -21,36 +27,38 @@ Version format: **major.minor.patch** ([semver](https://semver.org/))
 - **Minor:** new features
 - **Patch:** bug fixes
 
-Do **not** edit `pubspec.yaml` version — GHA syncs it automatically from CHANGELOG.md.
+A PR check validates that VERSION and CHANGELOG.md versions match. Do **not** edit `pubspec.yaml` — GHA syncs it automatically.
 
-### 2. Commit and merge to main
+### 2. Merge to main
 
-Create a PR with the changelog update. Merge to main.
+Create a PR with both file changes. Merge to main.
 
-### 3. Automated build
+### 3. Automated build and deploy
 
-When the version in `CHANGELOG.md` changes on main, GitHub Actions automatically:
-- Runs all tests
-- Builds a signed AAB (Android App Bundle)
+When VERSION changes on main, GitHub Actions automatically:
+- Checks that the version isn't already released
+- Syncs version to pubspec.yaml
+- Builds a signed AAB
 - Creates a GitHub Release with the AAB attached
+- Deploys to Play Store internal testing via Fastlane
 
-### 5. Deploy to Play Store
+### 4. Promote to production
 
-Once Fastlane is set up (pending Google identity verification), the release workflow will automatically upload the AAB to the Play Store.
-
-Until then, manually upload:
+After verifying on internal testing:
 1. Go to [Google Play Console](https://play.google.com/console)
-2. Select Khushu → **Production** (or **Internal testing**)
-3. Click **Create new release**
-4. Download the AAB from the GitHub Release and upload it
-5. Add release notes (copy from CHANGELOG.md)
-6. Click **Review release** → **Start rollout**
+2. Select Khushu → **Internal testing**
+3. Click **Promote release** → **Production**
+4. Review and roll out
+
+## If a release fails
+
+Just fix the issue and merge to main. The release workflow checks VERSION against the latest GitHub Release — if the version hasn't been successfully released, it retries automatically.
 
 ## First-Time Setup (already done)
 
 - [x] Google Play Developer account ($25)
 - [x] App signing keystore (backed up securely)
-- [x] Keystore + passwords stored in GitHub Secrets
+- [x] Keystore password stored in GitHub Secrets
 - [x] Release workflow in `.github/workflows/release.yml`
 - [x] Privacy policy at GitHub Pages
 - [x] Store listing assets in `docs/store-listing/`
@@ -59,10 +67,12 @@ Until then, manually upload:
 
 | File | Purpose |
 |------|---------|
-| `pubspec.yaml` | App version (triggers release build) |
-| `CHANGELOG.md` | Version history |
-| `.github/workflows/release.yml` | Automated release build |
+| `VERSION` | Version number (triggers release build) |
+| `CHANGELOG.md` | Version history (must match VERSION) |
+| `pubspec.yaml` | Auto-synced by GHA — do not edit version manually |
+| `.github/workflows/release.yml` | Automated release build + deploy |
 | `.github/workflows/test.yml` | CI tests on every PR |
+| `.github/workflows/version-check.yml` | Validates VERSION ↔ CHANGELOG sync on PRs |
 | `docs/store-listing/listing.md` | Play Store copy |
 | `docs/privacy-policy.html` | Privacy policy (GitHub Pages) |
 | `~/khushu-release.jks` | Signing key (BACK THIS UP — never commit) |
