@@ -41,9 +41,7 @@ Future<void> onAlarmFired(int alarmId) async {
     importance: Importance.high,
     priority: Priority.high,
     playSound: type == NotificationType.sound,
-    enableVibration:
-        type == NotificationType.vibrate || type == NotificationType.sound,
-    silent: type == NotificationType.silent,
+    enableVibration: type == NotificationType.sound,
   );
 
   await plugin.show(

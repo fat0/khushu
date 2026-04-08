@@ -4,21 +4,11 @@ import 'package:khushu/core/models/user_settings.dart';
 
 void main() {
   group('NotificationType', () {
-    test('has all expected values', () {
-      expect(NotificationType.values.length, 5);
+    test('has 3 values: off, sound, adhan', () {
+      expect(NotificationType.values.length, 3);
       expect(NotificationType.values, contains(NotificationType.off));
-      expect(NotificationType.values, contains(NotificationType.silent));
-      expect(NotificationType.values, contains(NotificationType.vibrate));
       expect(NotificationType.values, contains(NotificationType.sound));
       expect(NotificationType.values, contains(NotificationType.adhan));
-    });
-  });
-
-  group('SoundPreference', () {
-    test('has system and gentle options', () {
-      expect(SoundPreference.values.length, 2);
-      expect(SoundPreference.values, contains(SoundPreference.system));
-      expect(SoundPreference.values, contains(SoundPreference.gentle));
     });
   });
 
@@ -32,22 +22,15 @@ void main() {
       expect(settings.notificationFor('Isha'), NotificationType.sound);
     });
 
-    test('defaults sound preference to system', () {
-      const settings = UserSettings();
-      expect(settings.soundPreference, SoundPreference.system);
-    });
-
     test('serializes and deserializes notification settings', () {
       final settings = const UserSettings().copyWith(
-        notificationTypes: {'Fajr': NotificationType.adhan, 'Dhuhr': NotificationType.vibrate},
-        soundPreference: SoundPreference.gentle,
+        notificationTypes: {'Fajr': NotificationType.adhan, 'Dhuhr': NotificationType.off},
       );
       final json = settings.toJson();
       final restored = UserSettings.fromJson(json);
       expect(restored.notificationFor('Fajr'), NotificationType.adhan);
-      expect(restored.notificationFor('Dhuhr'), NotificationType.vibrate);
+      expect(restored.notificationFor('Dhuhr'), NotificationType.off);
       expect(restored.notificationFor('Asr'), NotificationType.sound);
-      expect(restored.soundPreference, SoundPreference.gentle);
     });
 
     test('Sunrise returns off', () {

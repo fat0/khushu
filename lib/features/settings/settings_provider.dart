@@ -35,10 +35,6 @@ class SettingsNotifier extends StateNotifier<UserSettings> {
     await HiveService.saveSettings(state);
   }
 
-  Future<void> setSoundPreference(SoundPreference pref) async {
-    state = state.copyWith(soundPreference: pref);
-    await HiveService.saveSettings(state);
-  }
 }
 
 final settingsProvider =

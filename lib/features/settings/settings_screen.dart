@@ -3,9 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/location/location_service.dart';
 import '../../core/location/region_detector.dart';
-import '../../core/models/notification_type.dart';
 import '../../core/models/user_settings.dart';
-import '../../core/notifications/notification_service.dart';
 import '../../core/theme/app_colors.dart';
 import 'settings_provider.dart';
 
@@ -89,24 +87,29 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           // Notifications
           const _SectionHeader('Notifications'),
           const SizedBox(height: 8),
-          ...['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'].map((prayer) =>
-            _NotificationTile(
-              prayerName: prayer,
-              type: settings.notificationFor(prayer),
-              isDark: isDark,
-              onTap: () => _showNotificationDialog(context, ref, prayer, settings.notificationFor(prayer)),
+          Material(
+            color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
+            borderRadius: BorderRadius.circular(12),
+            child: InkWell(
+              onTap: () => context.push('/settings/notifications'),
+              borderRadius: BorderRadius.circular(12),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                child: Row(
+                  children: [
+                    Icon(Icons.notifications_outlined, size: 20,
+                        color: isDark ? AppColors.sage : AppColors.deepGreen),
+                    const SizedBox(width: 12),
+                    Text('Prayer Notifications',
+                        style: TextStyle(fontSize: 14,
+                            color: isDark ? AppColors.sage : AppColors.deepGreen)),
+                    const Spacer(),
+                    Icon(Icons.chevron_right, size: 20,
+                        color: isDark ? AppColors.darkSecondary : AppColors.lightSecondary),
+                  ],
+                ),
+              ),
             ),
-          ),
-          const SizedBox(height: 8),
-          _SoundPreferenceTile(
-            preference: settings.soundPreference,
-            isDark: isDark,
-            onTap: () {
-              final next = settings.soundPreference == SoundPreference.system
-                  ? SoundPreference.gentle
-                  : SoundPreference.system;
-              ref.read(settingsProvider.notifier).setSoundPreference(next);
-            },
           ),
 
           const SizedBox(height: 24),
@@ -182,60 +185,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           .setLocation(result.latitude, result.longitude, result.name);
       ref.read(settingsProvider.notifier).setMethodId(method);
       _cityController.clear();
-    }
-  }
-
-  Future<void> _showNotificationDialog(
-    BuildContext context,
-    WidgetRef ref,
-    String prayerName,
-    NotificationType current,
-  ) async {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
-    final selected = await showDialog<NotificationType>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: isDark ? AppColors.darkSurface : AppColors.lightSurface,
-        title: Text(
-          '$prayerName Notification',
-          style: TextStyle(
-            color: isDark ? AppColors.sage : AppColors.deepGreen,
-          ),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: NotificationType.values.map((type) {
-            final label = switch (type) {
-              NotificationType.off => 'Off',
-              NotificationType.silent => 'Silent',
-              NotificationType.vibrate => 'Vibrate',
-              NotificationType.sound => 'Sound',
-              NotificationType.adhan => 'Adhan',
-            };
-            return RadioListTile<NotificationType>(
-              title: Text(
-                label,
-                style: TextStyle(
-                  color: isDark ? AppColors.sage : AppColors.deepGreen,
-                ),
-              ),
-              value: type,
-              groupValue: current,
-              activeColor: AppColors.sage,
-              onChanged: (v) => Navigator.of(ctx).pop(v),
-            );
-          }).toList(),
-        ),
-      ),
-    );
-
-    if (selected != null && selected != current) {
-      if (selected != NotificationType.off) {
-        await NotificationService.requestPermission();
-      }
-      ref.read(settingsProvider.notifier).setNotificationType(prayerName, selected);
     }
   }
 
@@ -367,112 +316,3 @@ class _InfoTile extends StatelessWidget {
   }
 }
 
-class _NotificationTile extends StatelessWidget {
-  final String prayerName;
-  final NotificationType type;
-  final bool isDark;
-  final VoidCallback onTap;
-
-  const _NotificationTile({
-    required this.prayerName,
-    required this.type,
-    required this.isDark,
-    required this.onTap,
-  });
-
-  String get _typeLabel => switch (type) {
-        NotificationType.off => 'Off',
-        NotificationType.silent => 'Silent',
-        NotificationType.vibrate => 'Vibrate',
-        NotificationType.sound => 'Sound',
-        NotificationType.adhan => 'Adhan',
-      };
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 6),
-      child: Material(
-        color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
-        borderRadius: BorderRadius.circular(12),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(12),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  prayerName,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: isDark ? AppColors.sage : AppColors.deepGreen,
-                  ),
-                ),
-                Text(
-                  _typeLabel,
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: isDark ? AppColors.darkSecondary : AppColors.lightSecondary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _SoundPreferenceTile extends StatelessWidget {
-  final SoundPreference preference;
-  final bool isDark;
-  final VoidCallback onTap;
-
-  const _SoundPreferenceTile({
-    required this.preference,
-    required this.isDark,
-    required this.onTap,
-  });
-
-  String get _label => switch (preference) {
-        SoundPreference.system => 'System default',
-        SoundPreference.gentle => 'Gentle tone',
-      };
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
-      borderRadius: BorderRadius.circular(12),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Notification sound',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: isDark ? AppColors.sage : AppColors.deepGreen,
-                ),
-              ),
-              Text(
-                _label,
-                style: TextStyle(
-                  fontSize: 13,
-                  color: isDark ? AppColors.darkSecondary : AppColors.lightSecondary,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
