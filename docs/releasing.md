@@ -31,7 +31,7 @@ A PR check validates that VERSION and CHANGELOG.md versions match. Do **not** ed
 
 ### 2. Merge to main
 
-Create a PR with both file changes. Merge to main.
+Create a PR with both file changes. Can be bundled with a feature/fix PR or done separately. Merge to main.
 
 ### 3. Automated build and deploy
 
