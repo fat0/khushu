@@ -26,9 +26,8 @@ https://github.com/fat0/khushu/settings/secrets/actions
 | Secret | Purpose | How it was created |
 |--------|---------|-------------------|
 | `KEYSTORE_BASE64` | Base64-encoded release signing keystore | `base64 -i ~/khushu-release.jks \| pbcopy` |
-| `KEYSTORE_PASSWORD` | Password for the keystore | Set during `keytool -genkey` |
-| `KEY_PASSWORD` | Password for the key alias | Same as keystore password (unless set differently) |
-| `PLAY_STORE_SERVICE_ACCOUNT_JSON` | (Pending) Google Cloud service account key for automated Play Store deployment | Downloaded from Google Cloud Console |
+| `KEYSTORE_PASSWORD` | Password for the keystore (used for both store and key) | Set during `keytool -genkey` |
+| `PLAY_STORE_SERVICE_ACCOUNT_JSON` | Google Cloud service account key for automated Play Store deployment | Downloaded from Google Cloud Console |
 
 ## Signing Key
 

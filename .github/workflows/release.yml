@@ -74,7 +74,6 @@ jobs:
         env:
           KEYSTORE_PATH: /tmp/khushu-release.jks
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: flutter build appbundle --release
 
       - name: Upload AAB artifact

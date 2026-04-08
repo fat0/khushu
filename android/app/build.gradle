@@ -31,7 +31,7 @@ android {
                 storeFile file(System.getenv("KEYSTORE_PATH"))
                 storePassword System.getenv("KEYSTORE_PASSWORD")
                 keyAlias "khushu"
-                keyPassword System.getenv("KEY_PASSWORD")
+                keyPassword System.getenv("KEYSTORE_PASSWORD")
             } else if (keystorePropertiesFile.exists()) {
                 storeFile file(keystoreProperties['storeFile'])
                 storePassword keystoreProperties['storePassword']

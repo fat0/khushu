@@ -8,7 +8,7 @@
 
 - [x] 2.1 Generate a release keystore (.jks) using keytool — stored at ~/khushu-release.jks (back up securely)
 - [x] 2.2 Base64-encode the keystore and add as GitHub Secret `KEYSTORE_BASE64`
-- [x] 2.3 Add GitHub Secrets: `KEYSTORE_PASSWORD`, `KEY_PASSWORD`
+- [x] 2.3 Add GitHub Secrets: `KEYSTORE_PASSWORD`, `PLAY_STORE_SERVICE_ACCOUNT_JSON`
 - [x] 2.4 Configure `android/app/build.gradle` with signingConfigs that read from environment variables
 - [x] 2.5 Create `.github/workflows/release.yml` — builds signed AAB on tag push, uploads as artifact
 - [ ] 2.6 Test by pushing a tag: `git tag v1.0.0 && git push --tags` — verify AAB is produced
