@@ -45,6 +45,9 @@ dependencies:
   flutter_launcher_icons: ^0.14.3
   timezone: ^0.10.1
   lat_lng_to_timezone: ^0.2.0
+  flutter_local_notifications: ^19.5.0
+  android_alarm_manager_plus: ^5.0.0
+  just_audio: ^0.10.5
 
 dev_dependencies:
   flutter_test:
@@ -70,6 +73,7 @@ flutter:
 
   assets:
     - assets/images/
+    - assets/audio/
 
   # To add assets to your application, add an assets section, like this:
   # assets:
