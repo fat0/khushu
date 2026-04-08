@@ -92,7 +92,8 @@ final countdownProvider = StreamProvider<Duration>((ref) {
   return timesAsync.when(
     data: (times) {
       return Stream.periodic(const Duration(seconds: 1), (_) {
-        final now = (settings.latitude != null && settings.longitude != null)
+        final hasLocation = settings.latitude != null && settings.longitude != null;
+        final now = hasLocation
             ? TimezoneUtil.nowAt(settings.latitude!, settings.longitude!)
             : DateTime.now();
         final next = times.nextPrayer(now);
@@ -100,7 +101,9 @@ final countdownProvider = StreamProvider<Duration>((ref) {
         var targetHour = int.parse(parts[0]);
         var targetMinute = int.parse(parts[1]);
 
-        var target = DateTime(now.year, now.month, now.day, targetHour, targetMinute);
+        var target = hasLocation
+            ? TimezoneUtil.timeAt(settings.latitude!, settings.longitude!, targetHour, targetMinute)
+            : DateTime(now.year, now.month, now.day, targetHour, targetMinute);
 
         // If next prayer is tomorrow's Fajr
         if (target.isBefore(now)) {
