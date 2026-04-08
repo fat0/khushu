@@ -1,10 +1,14 @@
 name: Tests
 
 on:
-  push:
-    branches: [main]
   pull_request:
     branches: [main]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.github/**'
+      - 'openspec/**'
+      - 'image_ref/**'
 
 jobs:
   test:

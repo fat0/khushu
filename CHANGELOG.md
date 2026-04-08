@@ -4,6 +4,11 @@ All notable changes to Khushu will be documented in this file.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/). Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [1.0.2] — 2026-04-07
+
+### Fixed
+- Simplified signing to use single KEYSTORE_PASSWORD
+
 ## [1.0.1] — 2026-04-07
 
 ### Changed
