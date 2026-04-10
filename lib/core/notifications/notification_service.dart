@@ -7,6 +7,7 @@ import '../location/timezone_util.dart';
 import '../models/notification_type.dart';
 import '../models/prayer_times.dart';
 import '../models/user_settings.dart';
+import 'adhan_player.dart';
 import 'alarm_callback.dart';
 
 class NotificationService {
@@ -26,6 +27,12 @@ class NotificationService {
       const InitializationSettings(
         android: AndroidInitializationSettings('@mipmap/ic_launcher'),
       ),
+      onDidReceiveNotificationResponse: (response) {
+        if (response.actionId == 'stop_adhan') {
+          AdhanPlayer.stop();
+          plugin.cancel(response.id ?? 0);
+        }
+      },
     );
 
     // Create the notification channel
