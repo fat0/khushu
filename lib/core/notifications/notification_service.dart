@@ -28,10 +28,9 @@ class NotificationService {
         android: AndroidInitializationSettings('@mipmap/ic_launcher'),
       ),
       onDidReceiveNotificationResponse: (response) {
-        if (response.actionId == 'stop_adhan') {
-          AdhanPlayer.stop();
-          plugin.cancel(response.id ?? 0);
-        }
+        AdhanPlayer.stop();
+        plugin.cancel(response.id ?? 0);
+        DebugLog.info('[NOTIFY] Notification tapped — stopping adhan');
       },
     );
 
@@ -116,6 +115,27 @@ class NotificationService {
 
       DebugLog.info('[NOTIFY] Scheduled $name at $timeStr (id=$alarmId)');
     }
+  }
+
+  /// Fire a test notification immediately using the first non-off prayer's type
+  static Future<void> fireTestNotification(UserSettings settings) async {
+    const testPrayers = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
+    var testPrayer = 'Dhuhr';
+    var testType = NotificationType.sound;
+
+    for (final p in testPrayers) {
+      final t = settings.notificationFor(p);
+      if (t != NotificationType.off) {
+        testPrayer = p;
+        testType = t;
+        break;
+      }
+    }
+
+    DebugLog.info('[NOTIFY] Test firing: $testPrayer as ${testType.name}');
+
+    // Directly call the alarm callback with a test ID
+    await onAlarmFired(_prayerIds[testPrayer]!);
   }
 
   static Future<void> cancelAll() async {

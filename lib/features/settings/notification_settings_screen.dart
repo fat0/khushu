@@ -28,20 +28,32 @@ class NotificationSettingsScreen extends ConsumerWidget {
       ),
       body: ListView(
         padding: const EdgeInsets.all(20),
-        children: _prayers.map((prayer) {
-          final type = settings.notificationFor(prayer);
-          return _PrayerNotificationTile(
-            prayer: prayer,
-            type: type,
-            isDark: isDark,
-            onChanged: (newType) async {
-              if (newType != NotificationType.off) {
-                await NotificationService.requestPermission();
-              }
-              ref.read(settingsProvider.notifier).setNotificationType(prayer, newType);
-            },
-          );
-        }).toList(),
+        children: [
+          ..._prayers.map((prayer) {
+            final type = settings.notificationFor(prayer);
+            return _PrayerNotificationTile(
+              prayer: prayer,
+              type: type,
+              isDark: isDark,
+              onChanged: (newType) async {
+                if (newType != NotificationType.off) {
+                  await NotificationService.requestPermission();
+                }
+                ref.read(settingsProvider.notifier).setNotificationType(prayer, newType);
+              },
+            );
+          }),
+          const SizedBox(height: 24),
+          ElevatedButton.icon(
+            onPressed: () => NotificationService.fireTestNotification(settings),
+            icon: const Icon(Icons.play_arrow, size: 18),
+            label: const Text('Test Notification Now'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.sage,
+              foregroundColor: AppColors.cream,
+            ),
+          ),
+        ],
       ),
     );
   }
