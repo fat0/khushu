@@ -65,53 +65,57 @@ class _PrayerNotificationTile extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
           color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
           children: [
-            Expanded(
-              flex: 2,
-              child: Text(
-                prayer,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: isDark ? AppColors.sage : AppColors.deepGreen,
-                ),
+            Text(
+              prayer,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: isDark ? AppColors.sage : AppColors.deepGreen,
               ),
             ),
-            Expanded(
-              flex: 3,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: NotificationType.values.map((option) {
-                  final isSelected = type == option;
-                  final label = switch (option) {
-                    NotificationType.off => 'Off',
-                    NotificationType.sound => 'Sound',
-                    NotificationType.adhan => 'Adhan',
-                  };
-                  return Padding(
-                    padding: const EdgeInsets.only(left: 4),
-                    child: ChoiceChip(
-                      label: Text(label, style: const TextStyle(fontSize: 12)),
-                      selected: isSelected,
-                      onSelected: (_) => onChanged(option),
-                      selectedColor: AppColors.sage,
-                      labelStyle: TextStyle(
-                        color: isSelected
-                            ? AppColors.cream
-                            : (isDark ? AppColors.darkSecondary : AppColors.lightSecondary),
-                      ),
-                      backgroundColor: isDark ? AppColors.darkBackground : AppColors.cream,
-                      side: BorderSide.none,
-                      visualDensity: VisualDensity.compact,
-                    ),
-                  );
-                }).toList(),
+            const Spacer(),
+            SegmentedButton<NotificationType>(
+              segments: const [
+                ButtonSegment(value: NotificationType.off, label: Text('Off')),
+                ButtonSegment(value: NotificationType.sound, label: Text('Sound')),
+                ButtonSegment(value: NotificationType.adhan, label: Text('Adhan')),
+              ],
+              selected: {type},
+              onSelectionChanged: (selected) => onChanged(selected.first),
+              showSelectedIcon: false,
+              style: ButtonStyle(
+                textStyle: WidgetStatePropertyAll(
+                  const TextStyle(fontSize: 12),
+                ),
+                visualDensity: VisualDensity.compact,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                padding: WidgetStatePropertyAll(
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                ),
+                backgroundColor: WidgetStateProperty.resolveWith((states) {
+                  if (states.contains(WidgetState.selected)) {
+                    return AppColors.sage;
+                  }
+                  return isDark ? AppColors.darkBackground : AppColors.cream;
+                }),
+                foregroundColor: WidgetStateProperty.resolveWith((states) {
+                  if (states.contains(WidgetState.selected)) {
+                    return AppColors.cream;
+                  }
+                  return isDark ? AppColors.darkSecondary : AppColors.lightSecondary;
+                }),
+                side: WidgetStatePropertyAll(
+                  BorderSide(
+                    color: isDark ? AppColors.darkSecondary.withValues(alpha: 0.3) : AppColors.lightSecondary.withValues(alpha: 0.3),
+                  ),
+                ),
               ),
             ),
           ],

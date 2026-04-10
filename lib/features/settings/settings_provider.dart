@@ -21,6 +21,7 @@ class SettingsNotifier extends StateNotifier<UserSettings> {
   Future<void> setLocation(double lat, double lng, String name) async {
     state = state.copyWith(latitude: lat, longitude: lng, locationName: name);
     await HiveService.saveSettings(state);
+    await HiveService.clearPrayerCache();
   }
 
   Future<void> completeOnboarding() async {
