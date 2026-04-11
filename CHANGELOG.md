@@ -4,6 +4,27 @@ All notable changes to Khushu will be documented in this file.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/). Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+- Prayer notifications with adhan audio playback (Doha recordings, Public Domain)
+- Per-prayer notification settings: Off / Sound / Adhan
+- Fajr-specific adhan with "As-salatu khayrun min an-nawm"
+- Adhan fires with app closed and screen locked
+- Stop button on notification
+- Notification permission prompt when enabling Sound or Adhan
+- "Open Settings" dialog when notification permission denied
+- Location-aware cache validation prevents stale prayer times on city switch
+
+### Changed
+- Default notifications set to Off (user opts in)
+- Notification text shortened to "Time for [Prayer]" with Stop button
+
+### Fixed
+- IANA timezone alias handling (Europe/Kiev → Europe/Kyiv)
+- Cache not clearing on location change
+- HiveService safe to initialize multiple times
+
 ## [1.0.4] — 2026-04-08
 
 ### Fixed
