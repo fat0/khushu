@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/models/notification_type.dart';
-import '../../core/notifications/notification_service.dart';
 import '../../core/theme/app_colors.dart';
 import 'settings_provider.dart';
 
@@ -10,6 +10,56 @@ class NotificationSettingsScreen extends ConsumerWidget {
   const NotificationSettingsScreen({super.key});
 
   static const _prayers = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
+
+  Future<bool> _ensureNotificationPermission(BuildContext context) async {
+    final plugin = FlutterLocalNotificationsPlugin();
+    final android = plugin.resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>();
+
+    // Request permission — returns true if already granted
+    final granted = await android?.requestNotificationsPermission() ?? true;
+    if (granted) return true;
+
+    // Permission denied — show dialog with Open Settings button
+    if (context.mounted) {
+      await showDialog(
+        context: context,
+        builder: (ctx) {
+          final isDark = Theme.of(ctx).brightness == Brightness.dark;
+          return AlertDialog(
+            backgroundColor: isDark ? AppColors.darkSurface : AppColors.lightSurface,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            title: Text(
+              'Notifications Disabled',
+              style: TextStyle(color: isDark ? AppColors.sage : AppColors.deepGreen),
+            ),
+            content: Text(
+              'If you want prayer alerts, enable notifications in your phone settings.',
+              style: TextStyle(color: isDark ? AppColors.darkSecondary : AppColors.lightSecondary),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Not Now'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  android?.requestNotificationsPermission();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.sage,
+                  foregroundColor: AppColors.cream,
+                ),
+                child: const Text('Open Settings'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+    return false;
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -28,32 +78,21 @@ class NotificationSettingsScreen extends ConsumerWidget {
       ),
       body: ListView(
         padding: const EdgeInsets.all(20),
-        children: [
-          ..._prayers.map((prayer) {
-            final type = settings.notificationFor(prayer);
-            return _PrayerNotificationTile(
-              prayer: prayer,
-              type: type,
-              isDark: isDark,
-              onChanged: (newType) async {
-                if (newType != NotificationType.off) {
-                  await NotificationService.requestPermission();
-                }
-                ref.read(settingsProvider.notifier).setNotificationType(prayer, newType);
-              },
-            );
-          }),
-          const SizedBox(height: 24),
-          ElevatedButton.icon(
-            onPressed: () => NotificationService.fireTestNotification(settings),
-            icon: const Icon(Icons.play_arrow, size: 18),
-            label: const Text('Test Notification Now'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.sage,
-              foregroundColor: AppColors.cream,
-            ),
-          ),
-        ],
+        children: _prayers.map((prayer) {
+          final type = settings.notificationFor(prayer);
+          return _PrayerNotificationTile(
+            prayer: prayer,
+            type: type,
+            isDark: isDark,
+            onChanged: (newType) async {
+              if (newType != NotificationType.off) {
+                final granted = await _ensureNotificationPermission(context);
+                if (!granted) return;
+              }
+              ref.read(settingsProvider.notifier).setNotificationType(prayer, newType);
+            },
+          );
+        }).toList(),
       ),
     );
   }
@@ -125,7 +164,9 @@ class _PrayerNotificationTile extends StatelessWidget {
                 }),
                 side: WidgetStatePropertyAll(
                   BorderSide(
-                    color: isDark ? AppColors.darkSecondary.withValues(alpha: 0.3) : AppColors.lightSecondary.withValues(alpha: 0.3),
+                    color: isDark
+                        ? AppColors.darkSecondary.withValues(alpha: 0.3)
+                        : AppColors.lightSecondary.withValues(alpha: 0.3),
                   ),
                 ),
               ),

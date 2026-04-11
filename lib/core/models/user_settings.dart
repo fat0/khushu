@@ -26,7 +26,7 @@ class UserSettings {
 
   NotificationType notificationFor(String prayerName) {
     if (prayerName == 'Sunrise') return NotificationType.off;
-    return notificationTypes[prayerName] ?? NotificationType.sound;
+    return notificationTypes[prayerName] ?? NotificationType.off;
   }
 
   int get apiMethod {

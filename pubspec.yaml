@@ -46,10 +46,7 @@ dependencies:
   timezone: ^0.10.1
   lat_lng_to_timezone: ^0.2.0
   flutter_local_notifications: ^19.5.0
-  android_alarm_manager_plus: ^5.0.0
-  just_audio: ^0.10.5
-  permission_handler: ^11.3.1
-  path_provider: ^2.1.5
+  alarm: ^5.1.5
 
 dev_dependencies:
   flutter_test:

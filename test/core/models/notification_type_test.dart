@@ -13,13 +13,13 @@ void main() {
   });
 
   group('UserSettings with notifications', () {
-    test('defaults all prayers to sound', () {
+    test('defaults all prayers to off', () {
       const settings = UserSettings();
-      expect(settings.notificationFor('Fajr'), NotificationType.sound);
-      expect(settings.notificationFor('Dhuhr'), NotificationType.sound);
-      expect(settings.notificationFor('Asr'), NotificationType.sound);
-      expect(settings.notificationFor('Maghrib'), NotificationType.sound);
-      expect(settings.notificationFor('Isha'), NotificationType.sound);
+      expect(settings.notificationFor('Fajr'), NotificationType.off);
+      expect(settings.notificationFor('Dhuhr'), NotificationType.off);
+      expect(settings.notificationFor('Asr'), NotificationType.off);
+      expect(settings.notificationFor('Maghrib'), NotificationType.off);
+      expect(settings.notificationFor('Isha'), NotificationType.off);
     });
 
     test('serializes and deserializes notification settings', () {
@@ -30,7 +30,7 @@ void main() {
       final restored = UserSettings.fromJson(json);
       expect(restored.notificationFor('Fajr'), NotificationType.adhan);
       expect(restored.notificationFor('Dhuhr'), NotificationType.off);
-      expect(restored.notificationFor('Asr'), NotificationType.sound);
+      expect(restored.notificationFor('Asr'), NotificationType.off);
     });
 
     test('Sunrise returns off', () {

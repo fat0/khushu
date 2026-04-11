@@ -23,13 +23,12 @@ class PrayerTimesNotifier extends AsyncNotifier<PrayerTimes> {
       throw Exception('Location not set');
     }
 
-    // Try cache first
+    // Try cache first — must match location and fiqh
     final today = DateTime.now();
-    final cached = HiveService.loadCachedPrayerTimes(today);
+    final locationValid = HiveService.isCacheValidForLocation(today, settings.latitude!, settings.longitude!);
+    final cached = locationValid ? HiveService.loadCachedPrayerTimes(today) : null;
     if (cached != null) {
       DebugLog.info('Cache hit: asr=${cached.asr}, asrHanafi=${cached.asrHanafi}, fiqh=${settings.fiqh}');
-      // For Sunni, cache must include Hanafi Asr
-      // For Ja'fari, cache must NOT include Hanafi Asr
       final sunniValid = settings.fiqh == Fiqh.sunni && cached.asrHanafi != null;
       final jafariValid = settings.fiqh == Fiqh.jafari && cached.asrHanafi == null;
       if (sunniValid || jafariValid) {
@@ -42,8 +41,8 @@ class PrayerTimesNotifier extends AsyncNotifier<PrayerTimes> {
     final times = await _fetchTimes(settings, today);
     DebugLog.info('Fetched: asr=${times.asr}, asrHanafi=${times.asrHanafi}');
 
-    // Cache for today
-    await HiveService.cachePrayerTimes(times);
+    // Cache for today with location
+    await HiveService.cachePrayerTimes(times, lat: settings.latitude, lng: settings.longitude);
     NotificationService.scheduleAllPrayers(times: times, settings: settings);
     return times;
   }
@@ -81,7 +80,7 @@ class PrayerTimesNotifier extends AsyncNotifier<PrayerTimes> {
 
     state = await AsyncValue.guard(() async {
       final times = await _fetchTimes(settings, DateTime.now());
-      await HiveService.cachePrayerTimes(times);
+      await HiveService.cachePrayerTimes(times, lat: settings.latitude, lng: settings.longitude);
       NotificationService.scheduleAllPrayers(times: times, settings: settings);
       return times;
     });
