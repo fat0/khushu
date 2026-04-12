@@ -134,5 +134,5 @@ All adhan recordings are from the Internet Archive, licensed under **Public Doma
 
 **Known issues:**
 - Field recordings (ambient mosque sound, not studio quality)
-- Standard adhan includes dua at the end (to be trimmed in future update)
+- Adhans include dua at the end (to be trimmed in future update)
 - Future: add multiple adhan options (Al Aqsa, Makkah, etc.) pending proper licensing
