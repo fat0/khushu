@@ -79,11 +79,14 @@ jobs:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
         run: flutter build appbundle --release
 
+      - name: Rename AAB
+        run: cp build/app/outputs/bundle/release/app-release.aab "khushu-v${{ needs.check-version.outputs.version }}.aab"
+
       - name: Upload AAB artifact
         uses: actions/upload-artifact@v4
         with:
           name: khushu-v${{ needs.check-version.outputs.version }}
-          path: build/app/outputs/bundle/release/app-release.aab
+          path: "khushu-v${{ needs.check-version.outputs.version }}.aab"
 
       - name: Create GitHub Release
         env:
@@ -92,7 +95,7 @@ jobs:
           gh release create "v${{ needs.check-version.outputs.version }}" \
             --title "Khushu v${{ needs.check-version.outputs.version }}" \
             --notes-file CHANGELOG.md \
-            build/app/outputs/bundle/release/app-release.aab
+            "khushu-v${{ needs.check-version.outputs.version }}.aab"
 
       - name: Deploy to Play Store (internal testing)
         run: |
