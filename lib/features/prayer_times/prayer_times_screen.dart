@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
+import '../../core/api/aladhan_api.dart';
 import '../../core/debug_log.dart';
 import '../../core/location/location_service.dart';
 import '../../core/location/region_detector.dart';
@@ -108,7 +109,9 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    error.toString(),
+                    error is PrayerTimesException
+                        ? error.message
+                        : 'Please check your internet connection and try again.',
                     style: Theme.of(context).textTheme.bodyMedium,
                     textAlign: TextAlign.center,
                   ),
