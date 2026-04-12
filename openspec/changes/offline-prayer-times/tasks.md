@@ -57,5 +57,5 @@
 - [x] 8.1 Add `connectivity_plus` package
 - [x] 8.2 Add connectivity listener to prayer times provider — refetch from API when connectivity restored
 - [x] 8.3 When connectivity lost and current data is API-sourced, recalculate offline
-- [ ] 8.4 Test: turn off wifi while app is open — verify offline indicator appears
-- [ ] 8.5 Test: turn on wifi while app is open — verify offline indicator disappears and API data loads
+- [x] 8.4 Test: turn off wifi while app is open — verify offline indicator appears
+- [x] 8.5 Test: turn on wifi while app is open — verify offline indicator disappears and API data loads
