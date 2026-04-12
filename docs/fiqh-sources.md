@@ -120,3 +120,19 @@ On Fridays, Ja'fari fiqh adds 4 extra rakat to the Dhuhr+Asr nafilah block (tota
 
 - **Ja'fari (Ruling 754):** Travelers cannot perform Dhuhr and Asr nafilah. Isha nafilah may be performed with the intention of raja' (hope of reward).
 - **Sunni:** Sunnah prayers are generally omitted while traveling across all 4 schools, except Fajr sunnah and Witr which are maintained.
+
+## Adhan Audio Sources
+
+All adhan recordings are from the Internet Archive, licensed under **Public Domain Mark 1.0**.
+
+| File | Source | URL | Usage |
+|------|--------|-----|-------|
+| `assets/audio/adhan_standard.ogg` | Dhuhr Adhan, Doha, Qatar (2013-2014) | [archive.org/details/adhan.recordings.from.doha.qatar](https://archive.org/details/adhan.recordings.from.doha.qatar) | All prayers except Fajr |
+| `assets/audio/adhan_fajr.ogg` | Fajr Adhan, Doha, Qatar (2013-2014) | [archive.org/details/adhan.recordings.from.doha.qatar](https://archive.org/details/adhan.recordings.from.doha.qatar) | Fajr only (includes "As-salatu khayrun min an-nawm") |
+
+**License:** Public Domain Mark 1.0 — no copyright restrictions, free for commercial use.
+
+**Known issues:**
+- Field recordings (ambient mosque sound, not studio quality)
+- Standard adhan includes dua at the end (to be trimmed in future update)
+- Future: add multiple adhan options (Al Aqsa, Makkah, etc.) pending proper licensing
