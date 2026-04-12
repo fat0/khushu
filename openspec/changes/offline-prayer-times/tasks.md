@@ -50,4 +50,4 @@
 - [x] 7.6 Unit test: rate limit retry with Retry-After header
 - [x] 7.7 Unit test: cache validation prefers API source over offline
 - [x] 7.8 Run all existing tests — verify no regressions
-- [ ] 7.9 Manual test: enable airplane mode, open app — verify prayer times load with offline indicator
+- [x] 7.9 Manual test: enable airplane mode, open app — verify prayer times load with offline indicator
