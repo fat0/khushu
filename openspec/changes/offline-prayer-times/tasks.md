@@ -45,9 +45,9 @@
 - [x] 7.1 Unit test: offline calculator returns correct times for ISNA method
 - [x] 7.2 Unit test: offline calculator handles dual Asr
 - [x] 7.3 Unit test: method ID mapping covers all supported methods
-- [ ] 7.4 Unit test: fallback logic — API failure triggers offline calculation
-- [ ] 7.5 Unit test: rate limit detection — 429 triggers retry
-- [ ] 7.6 Unit test: rate limit retry with Retry-After header
+- [x] 7.4 Unit test: fallback logic — API failure triggers offline calculation
+- [x] 7.5 Unit test: rate limit detection — 429 triggers retry
+- [x] 7.6 Unit test: rate limit retry with Retry-After header
 - [x] 7.7 Unit test: cache validation prefers API source over offline
 - [x] 7.8 Run all existing tests — verify no regressions
 - [ ] 7.9 Manual test: enable airplane mode, open app — verify prayer times load with offline indicator

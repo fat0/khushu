@@ -3,10 +3,13 @@ import '../debug_log.dart';
 import '../models/prayer_times.dart';
 
 class AlAdhanApi {
-  static final _dio = Dio(BaseOptions(
+  static Dio _dio = Dio(BaseOptions(
     connectTimeout: const Duration(seconds: 10),
     receiveTimeout: const Duration(seconds: 10),
   ));
+
+  /// For testing only — inject a mock Dio instance
+  static void setDioForTesting(Dio dio) => _dio = dio;
 
   static String buildUrl({
     required double latitude,
