@@ -19,3 +19,4 @@ android/app/.cxx/
 android/key.properties
 google-services.json
 GoogleService-Info.plist
+.claude/settings.local.json
