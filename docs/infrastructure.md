@@ -44,8 +44,27 @@ https://github.com/fat0/khushu/settings/secrets/actions
 
 | Workflow | File | Trigger | What it does |
 |----------|------|---------|-------------|
-| Tests | `.github/workflows/test.yml` | Push to main, PRs to main | Runs `flutter analyze` + `flutter test` |
-| Release | `.github/workflows/release.yml` | Version change in `pubspec.yaml` on main | Runs tests → builds signed AAB → creates GitHub Release |
+| Tests | `.github/workflows/test.yml` | PRs to main (skips docs/GHA-only changes) | Runs `flutter analyze` + `flutter test` |
+| Release | `.github/workflows/release.yml` | VERSION change on main | Builds signed AAB → GitHub Release → Fastlane deploy |
+| Security | `.github/workflows/security.yml` | PRs + push to main | Gitleaks (secrets) + Trivy (vulnerabilities) |
+| CodeQL | `.github/workflows/codeql.yml` | Push to main + weekly Monday | Java/Kotlin code security analysis |
+| Dependabot Auto-merge | `.github/workflows/dependabot-auto-merge.yml` | Dependabot PRs | Auto-merges safe updates (see below) |
+| Version Check | `.github/workflows/version-check.yml` | PRs changing VERSION or CHANGELOG | Validates VERSION ↔ CHANGELOG sync |
+
+### Dependabot Auto-merge Policy
+
+| PR type | Tests run | Auto-merge? |
+|---------|-----------|-------------|
+| GHA version bumps | Security scans only | Yes — all versions |
+| Pub dependency patches (x.y.Z) | Flutter tests + security | Yes — if all pass |
+| Pub dependency minor/major (x.Y.0 / X.0.0) | Flutter tests + security | No — manual review required |
+
+### Dependabot Configuration
+
+File: `.github/dependabot.yml`
+- Scans `pub` (Flutter packages) weekly
+- Scans `github-actions` (workflow actions) weekly
+- Opens up to 5 PRs per ecosystem
 
 ## GitHub Pages
 
