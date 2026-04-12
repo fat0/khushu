@@ -21,11 +21,11 @@
 
 ## 4. API rate limit handling
 
-- [ ] 4.1 Add Dio interceptor to `aladhan_api.dart` that detects HTTP 429 responses
-- [ ] 4.2 On 429: read `Retry-After` header (default 2 seconds if absent), wait, retry once
-- [ ] 4.3 If retry succeeds, return response normally
-- [ ] 4.4 If retry fails, throw `PrayerTimesException` so fallback kicks in
-- [ ] 4.5 Log rate limit events via DebugLog
+- [x] 4.1 Add Dio interceptor to `aladhan_api.dart` that detects HTTP 429 responses
+- [x] 4.2 On 429: read `Retry-After` header (default 2 seconds if absent), wait, retry once
+- [x] 4.3 If retry succeeds, return response normally
+- [x] 4.4 If retry fails, throw `PrayerTimesException` so fallback kicks in
+- [x] 4.5 Log rate limit events via DebugLog
 
 ## 5. Provider fallback logic
 
