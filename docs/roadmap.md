@@ -31,10 +31,10 @@
 
 ## Next Up
 1. Hijri calendar — Islamic date display
-2. Better adhan audio — Al Aqsa, Makkah options (licensing needed)
-3. Trim dua from current adhan recordings
-4. Offline prayer calculation (adhan-dart)
-5. Qibla compass
+2. Adhan audio improvements — trim dua from recordings, add Al Aqsa/Makkah options (licensing needed), user selection
+3. Offline prayer calculation (adhan-dart)
+4. Qibla compass
+5. AlAdhan API rate limiting — handle gracefully ([rate limit info](https://community.islamic.network/knowledgebase/2-is-there-a-rate-limit-on-the-apis))
 6. Multi-language support (Arabic, English, Urdu, Turkish, French)
 7. In-app donations
 
