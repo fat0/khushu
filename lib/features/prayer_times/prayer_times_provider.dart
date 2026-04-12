@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/api/aladhan_api.dart';
 import '../../core/debug_log.dart';
@@ -16,6 +17,8 @@ final prayerTimesProvider =
 );
 
 class PrayerTimesNotifier extends AsyncNotifier<PrayerTimes> {
+  StreamSubscription<List<ConnectivityResult>>? _connectivitySub;
+
   @override
   Future<PrayerTimes> build() async {
     final settings = ref.watch(settingsProvider);
@@ -23,6 +26,26 @@ class PrayerTimesNotifier extends AsyncNotifier<PrayerTimes> {
     if (settings.latitude == null || settings.longitude == null) {
       throw Exception('Location not set');
     }
+
+    // Listen for connectivity changes — auto-refresh when connection changes
+    _connectivitySub?.cancel();
+    _connectivitySub = Connectivity().onConnectivityChanged.listen((results) {
+      final hasConnection = results.any((r) => r != ConnectivityResult.none);
+      final currentState = state.valueOrNull;
+      if (currentState == null) return;
+
+      if (hasConnection && currentState.isOffline) {
+        // Back online — refetch from API
+        DebugLog.info('[CONNECTIVITY] Online — refreshing from API');
+        refresh();
+      } else if (!hasConnection && !currentState.isOffline) {
+        // Lost connection — recalculate offline
+        DebugLog.info('[CONNECTIVITY] Offline — switching to local calculation');
+        _switchToOffline(settings);
+      }
+    });
+
+    ref.onDispose(() => _connectivitySub?.cancel());
 
     // Try cache first — must match location and fiqh
     final today = DateTime.now();
@@ -81,6 +104,25 @@ class PrayerTimesNotifier extends AsyncNotifier<PrayerTimes> {
         DebugLog.info('Offline calculation also failed: $offlineError');
         throw PrayerTimesException('Could not calculate prayer times. Please check your location settings.');
       }
+    }
+  }
+
+  /// Switch to offline calculation when connectivity is lost
+  void _switchToOffline(UserSettings settings) {
+    if (settings.latitude == null || settings.longitude == null) return;
+    try {
+      final times = OfflineCalculator.calculate(
+        latitude: settings.latitude!,
+        longitude: settings.longitude!,
+        methodId: settings.apiMethod,
+        isSunni: settings.fiqh == Fiqh.sunni,
+        date: DateTime.now(),
+      );
+      HiveService.cachePrayerTimes(times, lat: settings.latitude, lng: settings.longitude);
+      NotificationService.scheduleAllPrayers(times: times, settings: settings);
+      state = AsyncData(times);
+    } catch (e) {
+      DebugLog.info('[CONNECTIVITY] Offline calculation failed: $e');
     }
   }
 

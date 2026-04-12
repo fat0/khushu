@@ -77,6 +77,23 @@ The system SHALL prefer API-sourced cached data over offline-calculated cached d
 - **WHEN** cached times were from offline calculation and API is now available
 - **THEN** fresh times are fetched from API, replacing the offline cache
 
+### Requirement: Automatic connectivity-based refresh
+The system SHALL automatically detect network connectivity changes and refresh prayer times accordingly, without requiring the user to reopen the app.
+
+#### Scenario: Connectivity lost while app is open
+- **WHEN** the device loses internet connectivity while the app is open
+- **THEN** the system switches to offline calculation seamlessly
+- **AND** the offline indicator appears
+
+#### Scenario: Connectivity restored while app is open
+- **WHEN** the device regains internet connectivity while the app is open
+- **THEN** the system automatically refetches from the AlAdhan API
+- **AND** the offline indicator disappears
+
+#### Scenario: No user action required
+- **WHEN** connectivity changes in either direction
+- **THEN** the transition happens automatically without the user closing or reopening the app
+
 ### Requirement: Offline times cached normally
 The system SHALL cache offline-calculated prayer times the same way as API times.
 
