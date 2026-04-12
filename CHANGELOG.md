@@ -4,7 +4,7 @@ All notable changes to Khushu will be documented in this file.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/). Versioning follows [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [1.1.0] — 2026-04-11
 
 ### Added
 - Prayer notifications with adhan audio playback (Doha recordings, Public Domain)
