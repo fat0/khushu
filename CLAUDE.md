@@ -27,5 +27,5 @@ If the user pastes a secret in the conversation, warn them immediately and recom
 - **Commit after each task group** — don't batch up large uncommitted changes
 - **Mark tasks complete immediately** — update `- [ ]` to `- [x]` in the OpenSpec tasks.md as each task finishes
 - **Push to branch frequently** — so progress survives context resets
-- **Ask before making changes** — don't go on autopilot, clarify with the user first
-- **Don't deploy without permission** — build and install only when the user says go
+- **Implement autonomously** — follow the OpenSpec tasks, write code, run tests, fix issues without asking
+- **Never deploy to phone or Play Store without user permission** — build and test locally, but wait for the user before installing on device
