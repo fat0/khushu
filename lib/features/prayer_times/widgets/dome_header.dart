@@ -12,12 +12,14 @@ class DomeHeader extends StatefulWidget {
   final String locationName;
   final double? latitude;
   final double? longitude;
+  final bool isOffline;
 
   const DomeHeader({
     super.key,
     required this.locationName,
     this.latitude,
     this.longitude,
+    this.isOffline = false,
   });
 
   @override
@@ -113,10 +115,30 @@ class _DomeHeaderState extends State<DomeHeader> {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 6),
-                Text(
-                  widget.locationName,
-                  style: TextStyle(fontSize: 14, color: secondaryColor),
-                  textAlign: TextAlign.center,
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      widget.locationName,
+                      style: TextStyle(fontSize: 14, color: secondaryColor),
+                    ),
+                    if (widget.isOffline) ...[
+                      const SizedBox(width: 6),
+                      Icon(
+                        Icons.wifi_off,
+                        size: 12,
+                        color: secondaryColor.withValues(alpha: 0.6),
+                      ),
+                      const SizedBox(width: 3),
+                      Text(
+                        'offline',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: secondaryColor.withValues(alpha: 0.6),
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
                 const SizedBox(height: 4),
                 Text(

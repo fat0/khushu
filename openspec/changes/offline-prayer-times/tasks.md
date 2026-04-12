@@ -36,9 +36,9 @@
 
 ## 6. UI — offline indicator
 
-- [ ] 6.1 Add subtle wifi-off icon + "offline" text near location name in dome header
-- [ ] 6.2 Only show when prayer times source is offline
-- [ ] 6.3 Hide when API data is available
+- [x] 6.1 Add subtle wifi-off icon + "offline" text near location name in dome header
+- [x] 6.2 Only show when prayer times source is offline
+- [x] 6.3 Hide when API data is available
 
 ## 7. Testing
 
