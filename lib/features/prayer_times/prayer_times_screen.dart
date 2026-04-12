@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/debug_log.dart';
 import '../../core/location/location_service.dart';
@@ -31,15 +32,26 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen> {
   Future<void> _checkLocation() async {
     if (_checkedLocation) return;
     _checkedLocation = true;
-
     final settings = ref.read(settingsProvider);
     if (settings.latitude != null && settings.longitude != null) {
       DebugLog.gps('Location already set: ${settings.locationName}');
       return;
     }
 
-    // Try GPS silently
-    DebugLog.gps('First launch: trying GPS...');
+    // Request location permission explicitly
+    DebugLog.gps('First launch: requesting location permission...');
+    final permission = await Geolocator.requestPermission();
+    DebugLog.gps('Location permission: $permission');
+
+    if (permission == LocationPermission.denied ||
+        permission == LocationPermission.deniedForever) {
+      DebugLog.gpsWarning('Location permission denied — showing city dialog');
+      if (mounted) _showLocationDialog();
+      return;
+    }
+
+    // Permission granted — try GPS
+    DebugLog.gps('Trying GPS...');
     final result = await LocationService.getCurrentLocation();
 
     if (result != null && mounted) {

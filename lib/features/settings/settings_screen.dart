@@ -84,6 +84,36 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
           const SizedBox(height: 24),
 
+          // Notifications
+          const _SectionHeader('Notifications'),
+          const SizedBox(height: 8),
+          Material(
+            color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
+            borderRadius: BorderRadius.circular(12),
+            child: InkWell(
+              onTap: () => context.push('/settings/notifications'),
+              borderRadius: BorderRadius.circular(12),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                child: Row(
+                  children: [
+                    Icon(Icons.notifications_outlined, size: 20,
+                        color: isDark ? AppColors.sage : AppColors.deepGreen),
+                    const SizedBox(width: 12),
+                    Text('Prayer Notifications',
+                        style: TextStyle(fontSize: 14,
+                            color: isDark ? AppColors.sage : AppColors.deepGreen)),
+                    const Spacer(),
+                    Icon(Icons.chevron_right, size: 20,
+                        color: isDark ? AppColors.darkSecondary : AppColors.lightSecondary),
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 24),
+
           // Location
           const _SectionHeader('Location'),
           const SizedBox(height: 8),
@@ -285,3 +315,4 @@ class _InfoTile extends StatelessWidget {
     );
   }
 }
+

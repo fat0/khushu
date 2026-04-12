@@ -7,10 +7,14 @@ class HiveService {
   static const _cacheBox = 'prayer_cache';
   static const _settingsKey = 'user_settings';
 
+  static bool _initialized = false;
+
   static Future<void> init() async {
+    if (_initialized) return;
     await Hive.initFlutter();
     await Hive.openBox(_settingsBox);
     await Hive.openBox(_cacheBox);
+    _initialized = true;
   }
 
   static UserSettings loadSettings() {
@@ -42,7 +46,7 @@ class HiveService {
     await box.clear();
   }
 
-  static Future<void> cachePrayerTimes(PrayerTimes times) async {
+  static Future<void> cachePrayerTimes(PrayerTimes times, {double? lat, double? lng}) async {
     final box = Hive.box(_cacheBox);
     final key = '${times.date.year}-${times.date.month}-${times.date.day}';
     await box.put(key, {
@@ -53,6 +57,21 @@ class HiveService {
       if (times.asrHanafi != null) 'AsrHanafi': times.asrHanafi,
       'Maghrib': times.maghrib,
       'Isha': times.isha,
+      if (lat != null) 'cachedLat': lat,
+      if (lng != null) 'cachedLng': lng,
     });
+  }
+
+  static bool isCacheValidForLocation(DateTime date, double lat, double lng) {
+    final box = Hive.box(_cacheBox);
+    final key = '${date.year}-${date.month}-${date.day}';
+    final json = box.get(key);
+    if (json == null) return false;
+    final map = Map<String, dynamic>.from(json);
+    final cachedLat = map['cachedLat'] as double?;
+    final cachedLng = map['cachedLng'] as double?;
+    if (cachedLat == null || cachedLng == null) return false;
+    // Check if coordinates match (within ~1km)
+    return (cachedLat - lat).abs() < 0.01 && (cachedLng - lng).abs() < 0.01;
   }
 }
