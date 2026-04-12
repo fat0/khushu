@@ -17,7 +17,7 @@
 - [x] 3.1 Add `PrayerTimeSource` enum (api, offline) to models
 - [x] 3.2 Add source field to `PrayerTimes` model
 - [x] 3.3 Add source to Hive cache (store and load)
-- [ ] 3.4 Cache validation: prefer API-sourced cache over offline cache
+- [x] 3.4 Cache validation: prefer API-sourced cache over offline cache
 
 ## 4. API rate limit handling
 
@@ -29,10 +29,10 @@
 
 ## 5. Provider fallback logic
 
-- [ ] 5.1 Update `PrayerTimesNotifier.build()` — add fallback: try API (with rate limit retry) → try adhan-dart → error
-- [ ] 5.2 Update `PrayerTimesNotifier.refresh()` with same fallback
-- [ ] 5.3 When API fails, log the error and calculate offline
-- [ ] 5.4 When API is available and cache is offline-sourced, refetch from API
+- [x] 5.1 Update `PrayerTimesNotifier.build()` — add fallback: try API (with rate limit retry) → try adhan-dart → error
+- [x] 5.2 Update `PrayerTimesNotifier.refresh()` with same fallback
+- [x] 5.3 When API fails, log the error and calculate offline
+- [x] 5.4 When API is available and cache is offline-sourced, refetch from API
 
 ## 6. UI — offline indicator
 

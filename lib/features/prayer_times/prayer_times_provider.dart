@@ -6,6 +6,7 @@ import '../../core/notifications/notification_service.dart';
 import '../../core/location/timezone_util.dart';
 import '../../core/models/prayer_times.dart';
 import '../../core/models/user_settings.dart';
+import '../../core/prayer/offline_calculator.dart';
 import '../../core/storage/hive_service.dart';
 import '../settings/settings_provider.dart';
 
@@ -28,27 +29,63 @@ class PrayerTimesNotifier extends AsyncNotifier<PrayerTimes> {
     final locationValid = HiveService.isCacheValidForLocation(today, settings.latitude!, settings.longitude!);
     final cached = locationValid ? HiveService.loadCachedPrayerTimes(today) : null;
     if (cached != null) {
-      DebugLog.info('Cache hit: asr=${cached.asr}, asrHanafi=${cached.asrHanafi}, fiqh=${settings.fiqh}');
+      DebugLog.info('Cache hit: asr=${cached.asr}, asrHanafi=${cached.asrHanafi}, fiqh=${settings.fiqh}, source=${cached.source}');
       final sunniValid = settings.fiqh == Fiqh.sunni && cached.asrHanafi != null;
       final jafariValid = settings.fiqh == Fiqh.jafari && cached.asrHanafi == null;
       if (sunniValid || jafariValid) {
+        // Prefer API-sourced cache — if cache is offline and we might have internet, refetch
+        if (cached.isOffline) {
+          DebugLog.info('Cache is offline-sourced — trying API first...');
+          try {
+            final times = await _fetchTimesFromApi(settings, today);
+            await HiveService.cachePrayerTimes(times, lat: settings.latitude, lng: settings.longitude);
+            NotificationService.scheduleAllPrayers(times: times, settings: settings);
+            return times;
+          } catch (_) {
+            DebugLog.info('API still unavailable — using offline cache');
+            NotificationService.scheduleAllPrayers(times: cached, settings: settings);
+            return cached;
+          }
+        }
         NotificationService.scheduleAllPrayers(times: cached, settings: settings);
         return cached;
       }
       DebugLog.info('Cache mismatch for ${settings.fiqh}, refetching...');
     }
 
-    final times = await _fetchTimes(settings, today);
-    DebugLog.info('Fetched: asr=${times.asr}, asrHanafi=${times.asrHanafi}');
-
-    // Cache for today with location
+    // Try API first, fall back to offline calculation
+    final times = await _fetchTimesWithFallback(settings, today);
     await HiveService.cachePrayerTimes(times, lat: settings.latitude, lng: settings.longitude);
     NotificationService.scheduleAllPrayers(times: times, settings: settings);
     return times;
   }
 
-  Future<PrayerTimes> _fetchTimes(UserSettings settings, DateTime date) async {
-    // For Sunni, fetch standard (school=0) as base
+  /// Try API → if fails → try adhan-dart → if fails → throw error
+  Future<PrayerTimes> _fetchTimesWithFallback(UserSettings settings, DateTime date) async {
+    try {
+      final times = await _fetchTimesFromApi(settings, date);
+      DebugLog.info('Fetched from API: asr=${times.asr}, asrHanafi=${times.asrHanafi}');
+      return times;
+    } catch (e) {
+      DebugLog.info('API failed ($e) — calculating offline...');
+      try {
+        final times = OfflineCalculator.calculate(
+          latitude: settings.latitude!,
+          longitude: settings.longitude!,
+          methodId: settings.apiMethod,
+          isSunni: settings.fiqh == Fiqh.sunni,
+          date: date,
+        );
+        return times;
+      } catch (offlineError) {
+        DebugLog.info('Offline calculation also failed: $offlineError');
+        throw PrayerTimesException('Could not calculate prayer times. Please check your location settings.');
+      }
+    }
+  }
+
+  /// Fetch from AlAdhan API (with rate limit retry built in)
+  Future<PrayerTimes> _fetchTimesFromApi(UserSettings settings, DateTime date) async {
     final times = await AlAdhanApi.fetchPrayerTimes(
       latitude: settings.latitude!,
       longitude: settings.longitude!,
@@ -57,7 +94,6 @@ class PrayerTimesNotifier extends AsyncNotifier<PrayerTimes> {
       date: date,
     );
 
-    // For Sunni, also fetch Hanafi Asr (school=1)
     if (settings.fiqh == Fiqh.sunni) {
       final hanafiTimes = await AlAdhanApi.fetchPrayerTimes(
         latitude: settings.latitude!,
@@ -79,7 +115,7 @@ class PrayerTimesNotifier extends AsyncNotifier<PrayerTimes> {
     state = const AsyncLoading();
 
     state = await AsyncValue.guard(() async {
-      final times = await _fetchTimes(settings, DateTime.now());
+      final times = await _fetchTimesWithFallback(settings, DateTime.now());
       await HiveService.cachePrayerTimes(times, lat: settings.latitude, lng: settings.longitude);
       NotificationService.scheduleAllPrayers(times: times, settings: settings);
       return times;
