@@ -1,22 +1,22 @@
 ## 1. Add adhan-dart package
 
-- [ ] 1.1 Add `adhan` package to pubspec.yaml
-- [ ] 1.2 Run `flutter pub get` — verify no conflicts
-- [ ] 1.3 Verify adhan-dart works with a simple test (calculate today's times for a known location, compare with AlAdhan API)
+- [x] 1.1 Add `adhan` package to pubspec.yaml
+- [x] 1.2 Run `flutter pub get` — verify no conflicts
+- [x] 1.3 Verify adhan-dart works with a simple test (calculate today's times for a known location, compare with AlAdhan API)
 
 ## 2. Prayer time calculator
 
-- [ ] 2.1 Create `lib/core/prayer/offline_calculator.dart` — wraps adhan-dart with our parameter mapping
-- [ ] 2.2 Map AlAdhan method IDs to adhan-dart `CalculationMethod` (ISNA, MWL, Umm Al-Qura, Egyptian, Karachi, Jafari)
-- [ ] 2.3 Handle unmapped methods — use custom `CalculationParameters` with Fajr/Isha angles
-- [ ] 2.4 Implement dual Asr calculation (standard + Hanafi) in offline mode
-- [ ] 2.5 Return `PrayerTimes` model matching API response format
+- [x] 2.1 Create `lib/core/prayer/offline_calculator.dart` — wraps adhan-dart with our parameter mapping
+- [x] 2.2 Map AlAdhan method IDs to adhan-dart `CalculationMethod` (ISNA, MWL, Umm Al-Qura, Egyptian, Karachi, Jafari)
+- [x] 2.3 Handle unmapped methods — use custom `CalculationParameters` with Fajr/Isha angles
+- [x] 2.4 Implement dual Asr calculation (standard + Hanafi) in offline mode
+- [x] 2.5 Return `PrayerTimes` model matching API response format
 
 ## 3. Data model updates
 
-- [ ] 3.1 Add `PrayerTimeSource` enum (api, offline) to models
-- [ ] 3.2 Add source field to `PrayerTimes` model
-- [ ] 3.3 Add source to Hive cache (store and load)
+- [x] 3.1 Add `PrayerTimeSource` enum (api, offline) to models
+- [x] 3.2 Add source field to `PrayerTimes` model
+- [x] 3.3 Add source to Hive cache (store and load)
 - [ ] 3.4 Cache validation: prefer API-sourced cache over offline cache
 
 ## 4. API rate limit handling
