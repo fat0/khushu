@@ -5,6 +5,11 @@ enum Fiqh {
   jafari,
 }
 
+enum CalendarType {
+  gregorian,
+  hijri,
+}
+
 class UserSettings {
   final Fiqh fiqh;
   final int? methodId;
@@ -13,6 +18,7 @@ class UserSettings {
   final String? locationName;
   final bool onboardingComplete;
   final Map<String, NotificationType> notificationTypes;
+  final CalendarType calendarType;
 
   const UserSettings({
     this.fiqh = Fiqh.sunni,
@@ -22,6 +28,7 @@ class UserSettings {
     this.locationName,
     this.onboardingComplete = false,
     this.notificationTypes = const {},
+    this.calendarType = CalendarType.gregorian,
   });
 
   NotificationType notificationFor(String prayerName) {
@@ -42,6 +49,7 @@ class UserSettings {
     String? locationName,
     bool? onboardingComplete,
     Map<String, NotificationType>? notificationTypes,
+    CalendarType? calendarType,
   }) {
     return UserSettings(
       fiqh: fiqh ?? this.fiqh,
@@ -51,6 +59,7 @@ class UserSettings {
       locationName: locationName ?? this.locationName,
       onboardingComplete: onboardingComplete ?? this.onboardingComplete,
       notificationTypes: notificationTypes ?? this.notificationTypes,
+      calendarType: calendarType ?? this.calendarType,
     );
   }
 
@@ -64,6 +73,7 @@ class UserSettings {
         'notificationTypes': notificationTypes.map(
           (key, value) => MapEntry(key, value.index),
         ),
+        'calendarType': calendarType.index,
       };
 
   factory UserSettings.fromJson(Map<String, dynamic> json) {
@@ -87,6 +97,11 @@ class UserSettings {
       },
     );
 
+    final calendarIndex = json['calendarType'] as int? ?? 0;
+    final calendarType = calendarIndex < CalendarType.values.length
+        ? CalendarType.values[calendarIndex]
+        : CalendarType.gregorian;
+
     return UserSettings(
       fiqh: fiqh,
       methodId: json['methodId'] as int?,
@@ -95,6 +110,7 @@ class UserSettings {
       locationName: json['locationName'] as String?,
       onboardingComplete: json['onboardingComplete'] as bool? ?? false,
       notificationTypes: notificationTypes,
+      calendarType: calendarType,
     );
   }
 }
