@@ -12,11 +12,13 @@ void main() {
         expect(bearing, lessThan(70));
       });
 
-      test('returns bearing for Makkah (0° — already there)', () {
-        // Exact Ka'bah coordinates as used by adhan internally
+      test('returns bearing for Makkah (degenerate — at Ka\'bah)', () {
+        // At the Ka'bah itself, great-circle bearing is undefined.
+        // adhan returns a value (may vary by platform), just verify it's a number.
         final bearing = QiblaService.getStaticBearing(21.4225241, 39.8261818);
-        // When at the Ka'bah, bearing is essentially 0 or 360
-        expect(bearing, anyOf(closeTo(0, 5), closeTo(360, 5)));
+        expect(bearing, isA<double>());
+        expect(bearing, greaterThanOrEqualTo(0));
+        expect(bearing, lessThanOrEqualTo(360));
       });
 
       test('returns bearing for Tokyo (WNW direction)', () {
