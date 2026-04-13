@@ -123,9 +123,12 @@ SVG reference saved in `.superpowers/brainstorm/39301-1776041086/content/kaabah-
 
 | Package | Purpose | Status |
 |---------|---------|--------|
-| `flutter_qiblah` | Compass stream, bearing, calibration | New — add to pubspec |
+| `flutter_qiblah` | Compass stream + Qibla bearing | New — add to pubspec |
+| `flutter_compass` | Sensor accuracy for calibration detection | New — add to pubspec (transitive dep of flutter_qiblah, pin explicitly) |
 | `adhan` | Qibla.qibla() for no-magnetometer fallback | Already installed |
 | `geolocator` | GPS coordinates | Already installed |
+
+**Note:** `flutter_qiblah` does not expose sensor accuracy in its `QiblahDirection` model. We read `FlutterCompass.events` directly for the `accuracy` field to power calibration prompts.
 
 ## Android Build Changes
 
