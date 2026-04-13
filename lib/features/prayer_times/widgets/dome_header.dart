@@ -4,15 +4,19 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:lat_lng_to_timezone/lat_lng_to_timezone.dart' as tzmap;
 import 'package:timezone/timezone.dart' as tz;
+import '../../../core/hijri/hijri_service.dart';
+import '../../../core/models/user_settings.dart';
 import '../../../core/theme/app_colors.dart';
 
 /// Dome header sizing and text position documented in docs/dome-header-spec.md
-/// Text at 65% from top, date line aligns with dome bottom edge.
+/// Text at 58% from top, two-line date+time layout.
 class DomeHeader extends StatefulWidget {
   final String locationName;
   final double? latitude;
   final double? longitude;
   final bool isOffline;
+  final CalendarType calendarType;
+  final String? hijriDate;
 
   const DomeHeader({
     super.key,
@@ -20,6 +24,8 @@ class DomeHeader extends StatefulWidget {
     this.latitude,
     this.longitude,
     this.isOffline = false,
+    this.calendarType = CalendarType.gregorian,
+    this.hijriDate,
   });
 
   @override
@@ -73,10 +79,20 @@ class _DomeHeaderState extends State<DomeHeader> {
     final svgDisplayWidth = screenWidth * 1.5;
     final svgDisplayHeight = svgDisplayWidth / 1.5;
     final containerHeight = svgDisplayHeight * 0.60;
-    final textTop = containerHeight * 0.65;
+    final textTop = containerHeight * 0.58;
 
     final timeStr = DateFormat('h:mm a').format(_now);
-    final dateStr = DateFormat('EEE, MMM d').format(_now);
+    final String dateDisplay;
+    if (widget.calendarType == CalendarType.hijri) {
+      if (widget.hijriDate != null) {
+        dateDisplay = widget.hijriDate!;
+      } else {
+        final hijri = HijriService.fromGregorian(_now);
+        dateDisplay = HijriService.formatHijriDate(hijri);
+      }
+    } else {
+      dateDisplay = DateFormat('EEE, MMM d, y').format(_now);
+    }
 
     return SizedBox(
       height: containerHeight,
@@ -142,8 +158,14 @@ class _DomeHeaderState extends State<DomeHeader> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '$dateStr  ·  $timeStr',
+                  dateDisplay,
                   style: TextStyle(fontSize: 13, color: isDark ? AppColors.sage : AppColors.deepGreen.withValues(alpha: 0.6)),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  timeStr,
+                  style: TextStyle(fontSize: 13, color: isDark ? AppColors.sage.withValues(alpha: 0.6) : AppColors.deepGreen.withValues(alpha: 0.4)),
                   textAlign: TextAlign.center,
                 ),
               ],

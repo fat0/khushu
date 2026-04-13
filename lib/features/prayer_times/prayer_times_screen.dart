@@ -144,6 +144,8 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen> {
                         latitude: settings.latitude,
                         longitude: settings.longitude,
                         isOffline: times.isOffline,
+                        calendarType: settings.calendarType,
+                        hijriDate: times.hijriDate,
                       ),
                       const SizedBox(height: 8),
                       countdownAsync.when(
