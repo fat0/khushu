@@ -22,6 +22,30 @@ If the user pastes a secret in the conversation, warn them immediately and recom
 - Wait for user approval before merging
 - **Never add `Co-Authored-By` lines to commit messages**
 
+## Git Worktrees
+
+Worktrees live in `.worktrees/` (gitignored). Use them to work on multiple features in parallel.
+
+**Current worktrees:**
+- `/Users/fatima/git/khushu` → `feat/hijri-calendar` (main directory)
+
+**To start a new feature branch in a worktree:**
+```bash
+git worktree add .worktrees/feat-X -b feat/X
+```
+
+**To list active worktrees:**
+```bash
+git worktree list
+```
+
+**To remove a worktree after merging:**
+```bash
+git worktree remove .worktrees/feat-X
+```
+
+Each worktree is fully isolated — separate working directory, `build/`, and `.dart_tool/`. They share `~/.pub-cache` safely.
+
 ## Implementation Rules
 
 - **Commit after each task group** — don't batch up large uncommitted changes
