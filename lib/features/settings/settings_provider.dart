@@ -36,6 +36,11 @@ class SettingsNotifier extends StateNotifier<UserSettings> {
     await HiveService.saveSettings(state);
   }
 
+  Future<void> setCalendarType(CalendarType type) async {
+    state = state.copyWith(calendarType: type);
+    await HiveService.saveSettings(state);
+  }
+
 }
 
 final settingsProvider =
