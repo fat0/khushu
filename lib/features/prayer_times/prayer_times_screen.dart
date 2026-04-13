@@ -8,6 +8,7 @@ import '../../core/location/location_service.dart';
 import '../../core/location/region_detector.dart';
 import '../../core/location/timezone_util.dart';
 import '../../core/theme/app_colors.dart';
+import '../qibla/widgets/qibla_button.dart';
 import '../settings/settings_provider.dart';
 import 'prayer_times_provider.dart';
 import 'widgets/dome_header.dart';
@@ -94,83 +95,95 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen> {
     final countdownAsync = ref.watch(countdownProvider);
 
     return Scaffold(
-      body: SafeArea(
-        child: timesAsync.when(
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (error, _) => Center(
-            child: Padding(
-              padding: const EdgeInsets.all(32),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'Could not load prayer times',
-                    style: Theme.of(context).textTheme.bodyLarge,
+      body: Stack(
+        children: [
+          SafeArea(
+            child: timesAsync.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (error, _) => Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(32),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Could not load prayer times',
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        error is PrayerTimesException
+                            ? error.message
+                            : 'Please check your internet connection and try again.',
+                        style: Theme.of(context).textTheme.bodyMedium,
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: () => ref.read(prayerTimesProvider.notifier).refresh(),
+                        child: const Text('Retry'),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    error is PrayerTimesException
-                        ? error.message
-                        : 'Please check your internet connection and try again.',
-                    style: Theme.of(context).textTheme.bodyMedium,
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () => ref.read(prayerTimesProvider.notifier).refresh(),
-                    child: const Text('Retry'),
-                  ),
-                ],
+                ),
               ),
+              data: (times) {
+                final now = (settings.latitude != null && settings.longitude != null)
+                    ? TimezoneUtil.nowAt(settings.latitude!, settings.longitude!)
+                    : DateTime.now();
+                final currentPrayer = times.currentPrayer(now);
+                final nextPrayer = times.nextPrayer(now);
+                final currentName = currentPrayer?.name ?? '';
+
+                return SingleChildScrollView(
+                  padding: const EdgeInsets.only(bottom: 24),
+                  child: Column(
+                    children: [
+                      DomeHeader(
+                        locationName: settings.locationName ?? 'Unknown',
+                        latitude: settings.latitude,
+                        longitude: settings.longitude,
+                        isOffline: times.isOffline,
+                      ),
+                      const SizedBox(height: 8),
+                      countdownAsync.when(
+                        data: (countdown) => NextPrayerCard(
+                          currentPrayerName: currentName,
+                          nextPrayerName: nextPrayer.name,
+                          countdown: countdown,
+                        ),
+                        loading: () => NextPrayerCard(
+                          currentPrayerName: currentName,
+                          nextPrayerName: nextPrayer.name,
+                          countdown: Duration.zero,
+                        ),
+                        error: (_, __) => NextPrayerCard(
+                          currentPrayerName: currentName,
+                          nextPrayerName: nextPrayer.name,
+                          countdown: Duration.zero,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      PrayerTimesList(
+                        prayerTimes: times,
+                        currentPrayerName: currentName,
+                        fiqh: settings.fiqh,
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
           ),
-          data: (times) {
-            final now = (settings.latitude != null && settings.longitude != null)
-                ? TimezoneUtil.nowAt(settings.latitude!, settings.longitude!)
-                : DateTime.now();
-            final currentPrayer = times.currentPrayer(now);
-            final nextPrayer = times.nextPrayer(now);
-            final currentName = currentPrayer?.name ?? '';
-
-            return SingleChildScrollView(
-              padding: const EdgeInsets.only(bottom: 24),
-              child: Column(
-                children: [
-                  DomeHeader(
-                    locationName: settings.locationName ?? 'Unknown',
-                    latitude: settings.latitude,
-                    longitude: settings.longitude,
-                    isOffline: times.isOffline,
-                  ),
-                  const SizedBox(height: 8),
-                  countdownAsync.when(
-                    data: (countdown) => NextPrayerCard(
-                      currentPrayerName: currentName,
-                      nextPrayerName: nextPrayer.name,
-                      countdown: countdown,
-                    ),
-                    loading: () => NextPrayerCard(
-                      currentPrayerName: currentName,
-                      nextPrayerName: nextPrayer.name,
-                      countdown: Duration.zero,
-                    ),
-                    error: (_, __) => NextPrayerCard(
-                      currentPrayerName: currentName,
-                      nextPrayerName: nextPrayer.name,
-                      countdown: Duration.zero,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  PrayerTimesList(
-                    prayerTimes: times,
-                    currentPrayerName: currentName,
-                    fiqh: settings.fiqh,
-                  ),
-                ],
-              ),
-            );
-          },
-        ),
+          // Qibla button — bottom-left
+          Positioned(
+            left: 16,
+            bottom: 16,
+            child: SafeArea(
+              child: QiblaButton(onPressed: () => context.push('/qibla')),
+            ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton.small(
         onPressed: () => context.push('/settings'),
