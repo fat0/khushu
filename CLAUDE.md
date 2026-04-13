@@ -22,6 +22,27 @@ If the user pastes a secret in the conversation, warn them immediately and recom
 - Wait for user approval before merging
 - **Never add `Co-Authored-By` lines to commit messages**
 
+## Git Worktrees
+
+This project uses git worktrees for parallel feature development. Worktrees live in `.worktrees/` (gitignored).
+
+**Start a new feature branch in a worktree:**
+```bash
+git worktree add .worktrees/feat-X -b feat/X
+```
+
+**List active worktrees:**
+```bash
+git worktree list
+```
+
+**Remove a worktree after merging:**
+```bash
+git worktree remove .worktrees/feat-X
+```
+
+Each worktree is fully isolated — separate working directory, `build/`, and `.dart_tool/`. They share `~/.pub-cache` safely. Always run `fvm flutter pub get` inside a new worktree before building.
+
 ## Implementation Rules
 
 - **Commit after each task group** — don't batch up large uncommitted changes

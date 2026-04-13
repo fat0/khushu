@@ -6,6 +6,35 @@ import 'widgets/calibration_overlay.dart';
 import 'widgets/compass_widget.dart';
 import 'widgets/static_bearing.dart';
 
+class _CrosshairPainter extends CustomPainter {
+  final bool isDark;
+  const _CrosshairPainter({required this.isDark});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = (isDark ? AppColors.sage : AppColors.deepGreen)
+          .withValues(alpha: 0.18)
+      ..strokeWidth = 1.0;
+
+    // Vertical line
+    canvas.drawLine(
+      Offset(size.width / 2, 0),
+      Offset(size.width / 2, size.height),
+      paint,
+    );
+    // Horizontal line
+    canvas.drawLine(
+      Offset(0, size.height / 2),
+      Offset(size.width, size.height / 2),
+      paint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(_CrosshairPainter old) => old.isDark != isDark;
+}
+
 class QiblaScreen extends ConsumerWidget {
   const QiblaScreen({super.key});
 
@@ -32,6 +61,12 @@ class QiblaScreen extends ConsumerWidget {
       ),
       body: Stack(
         children: [
+          // Full-screen crosshair lines (fixed, not rotating)
+          Positioned.fill(
+            child: CustomPaint(
+              painter: _CrosshairPainter(isDark: isDark),
+            ),
+          ),
           if (state.isLoading)
             const Center(child: CircularProgressIndicator())
           else if (!state.hasMagnetometer)
