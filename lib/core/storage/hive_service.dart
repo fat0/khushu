@@ -42,6 +42,7 @@ class HiveService {
       fajr: times.fajr, sunrise: times.sunrise, dhuhr: times.dhuhr,
       asr: times.asr, maghrib: times.maghrib, isha: times.isha,
       date: times.date, source: source,
+      hijriDate: map['hijriDate'] as String?,
     );
     final asrHanafi = map['AsrHanafi'] as String?;
     if (asrHanafi != null) return times.withHanafiAsr(asrHanafi);
@@ -67,6 +68,7 @@ class HiveService {
       if (lat != null) 'cachedLat': lat,
       if (lng != null) 'cachedLng': lng,
       'source': times.source == PrayerTimeSource.offline ? 'offline' : 'api',
+      if (times.hijriDate != null) 'hijriDate': times.hijriDate,
     });
   }
 
