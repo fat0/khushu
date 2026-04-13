@@ -84,36 +84,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
           const SizedBox(height: 24),
 
-          // Notifications
-          const _SectionHeader('Notifications'),
-          const SizedBox(height: 8),
-          Material(
-            color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
-            borderRadius: BorderRadius.circular(12),
-            child: InkWell(
-              onTap: () => context.push('/settings/notifications'),
-              borderRadius: BorderRadius.circular(12),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                child: Row(
-                  children: [
-                    Icon(Icons.notifications_outlined, size: 20,
-                        color: isDark ? AppColors.sage : AppColors.deepGreen),
-                    const SizedBox(width: 12),
-                    Text('Prayer Notifications',
-                        style: TextStyle(fontSize: 14,
-                            color: isDark ? AppColors.sage : AppColors.deepGreen)),
-                    const Spacer(),
-                    Icon(Icons.chevron_right, size: 20,
-                        color: isDark ? AppColors.darkSecondary : AppColors.lightSecondary),
-                  ],
-                ),
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 24),
-
           // Location
           const _SectionHeader('Location'),
           const SizedBox(height: 8),
@@ -168,6 +138,48 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               IconButton(onPressed: _searchCity, icon: const Icon(Icons.search)),
             ],
           ),
+
+          const SizedBox(height: 24),
+
+          // Notifications
+          const _SectionHeader('Notifications'),
+          const SizedBox(height: 8),
+          Material(
+            color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
+            borderRadius: BorderRadius.circular(12),
+            child: InkWell(
+              onTap: () => context.push('/settings/notifications'),
+              borderRadius: BorderRadius.circular(12),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                child: Row(
+                  children: [
+                    Icon(Icons.notifications_outlined, size: 20,
+                        color: isDark ? AppColors.sage : AppColors.deepGreen),
+                    const SizedBox(width: 12),
+                    Text('Prayer Notifications',
+                        style: TextStyle(fontSize: 14,
+                            color: isDark ? AppColors.sage : AppColors.deepGreen)),
+                    const Spacer(),
+                    Icon(Icons.chevron_right, size: 20,
+                        color: isDark ? AppColors.darkSecondary : AppColors.lightSecondary),
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 24),
+
+          // Calendar
+          const _SectionHeader('Calendar'),
+          const SizedBox(height: 8),
+          ...CalendarType.values.map((t) => _CalendarTile(
+                calendarType: t,
+                isSelected: settings.calendarType == t,
+                isDark: isDark,
+                onTap: () => ref.read(settingsProvider.notifier).setCalendarType(t),
+              )),
         ],
       ),
     );
@@ -241,6 +253,60 @@ class _FiqhTile extends StatelessWidget {
   String get _label => switch (fiqh) {
         Fiqh.sunni => 'Sunni (Maliki, Hanafi, Hanbali, Shafi\'i)',
         Fiqh.jafari => 'Shia (Ja\'fari)',
+      };
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Material(
+        color: isSelected
+            ? (isDark ? AppColors.highlightDark : AppColors.highlightLight)
+            : (isDark ? AppColors.darkSurface : AppColors.lightSurface),
+        borderRadius: BorderRadius.circular(12),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(12),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            child: Row(
+              children: [
+                Text(
+                  _label,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                    color: isDark ? AppColors.sage : AppColors.deepGreen,
+                  ),
+                ),
+                const Spacer(),
+                if (isSelected)
+                  const Icon(Icons.check, color: AppColors.sage, size: 18),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CalendarTile extends StatelessWidget {
+  final CalendarType calendarType;
+  final bool isSelected;
+  final bool isDark;
+  final VoidCallback onTap;
+
+  const _CalendarTile({
+    required this.calendarType,
+    required this.isSelected,
+    required this.isDark,
+    required this.onTap,
+  });
+
+  String get _label => switch (calendarType) {
+        CalendarType.gregorian => 'Gregorian',
+        CalendarType.hijri => 'Hijri (Islamic)',
       };
 
   @override
