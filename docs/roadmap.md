@@ -41,10 +41,9 @@
 ## Next Up
 1. Hijri calendar — Islamic date display
 2. Adhan audio improvements — trim dua from recordings, add Al Aqsa/Makkah options (licensing needed), user selection
-3. AlAdhan API rate limiting — handle gracefully ([rate limit info](https://community.islamic.network/knowledgebase/2-is-there-a-rate-limit-on-the-apis))
-4. Multi-language support (Arabic, English, Urdu, Turkish, French)
-5. In-app donations
-6. Dual source mode (adhan-dart + AlAdhan cross-validation)
+3. Multi-language support (Arabic, English, Urdu, Turkish, French)
+4. In-app donations
+5. Dual source mode (adhan-dart + AlAdhan cross-validation)
 
 ## Design Decisions
 - **Framework:** Flutter (Dart) — cross-platform Android & iOS
