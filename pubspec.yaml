@@ -47,6 +47,8 @@ dependencies:
   lat_lng_to_timezone: ^0.2.0
   flutter_local_notifications: ^19.5.0
   alarm: ^5.1.5
+  adhan: ^2.0.0+1
+  connectivity_plus: ^7.1.1
 
 dev_dependencies:
   flutter_test:

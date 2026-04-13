@@ -1,3 +1,5 @@
+enum PrayerTimeSource { api, offline }
+
 class PrayerTimeEntry {
   final String name;
   final String time;
@@ -23,6 +25,7 @@ class PrayerTimes {
   final String maghrib;
   final String isha;
   final DateTime date;
+  final PrayerTimeSource source;
 
   const PrayerTimes({
     required this.fajr,
@@ -33,6 +36,7 @@ class PrayerTimes {
     required this.maghrib,
     required this.isha,
     required this.date,
+    this.source = PrayerTimeSource.api,
   });
 
   factory PrayerTimes.fromAlAdhanJson(Map<String, dynamic> json, DateTime date) {
@@ -57,8 +61,11 @@ class PrayerTimes {
       maghrib: maghrib,
       isha: isha,
       date: date,
+      source: source,
     );
   }
+
+  bool get isOffline => source == PrayerTimeSource.offline;
 
   List<PrayerTimeEntry> toDisplayList() {
     return [

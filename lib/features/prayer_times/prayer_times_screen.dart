@@ -140,6 +140,7 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen> {
                     locationName: settings.locationName ?? 'Unknown',
                     latitude: settings.latitude,
                     longitude: settings.longitude,
+                    isOffline: times.isOffline,
                   ),
                   const SizedBox(height: 8),
                   countdownAsync.when(

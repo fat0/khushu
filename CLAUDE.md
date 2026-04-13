@@ -21,3 +21,11 @@ If the user pastes a secret in the conversation, warn them immediately and recom
 - Submit a PR to merge into main
 - Wait for user approval before merging
 - **Never add `Co-Authored-By` lines to commit messages**
+
+## Implementation Rules
+
+- **Commit after each task group** — don't batch up large uncommitted changes
+- **Mark tasks complete immediately** — update `- [ ]` to `- [x]` in the OpenSpec tasks.md as each task finishes
+- **Push to branch frequently** — so progress survives context resets
+- **Implement autonomously** — follow the OpenSpec tasks, write code, run tests, fix issues without asking
+- **Never deploy to phone or Play Store without user permission** — build and test locally, but wait for the user before installing on device

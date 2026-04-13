@@ -35,7 +35,14 @@ class HiveService {
     final json = box.get(key);
     if (json == null) return null;
     final map = Map<String, dynamic>.from(json);
-    final times = PrayerTimes.fromAlAdhanJson(map, date);
+    final sourceStr = map['source'] as String?;
+    final source = sourceStr == 'offline' ? PrayerTimeSource.offline : PrayerTimeSource.api;
+    var times = PrayerTimes.fromAlAdhanJson(map, date);
+    times = PrayerTimes(
+      fajr: times.fajr, sunrise: times.sunrise, dhuhr: times.dhuhr,
+      asr: times.asr, maghrib: times.maghrib, isha: times.isha,
+      date: times.date, source: source,
+    );
     final asrHanafi = map['AsrHanafi'] as String?;
     if (asrHanafi != null) return times.withHanafiAsr(asrHanafi);
     return times;
@@ -59,6 +66,7 @@ class HiveService {
       'Isha': times.isha,
       if (lat != null) 'cachedLat': lat,
       if (lng != null) 'cachedLng': lng,
+      'source': times.source == PrayerTimeSource.offline ? 'offline' : 'api',
     });
   }
 
