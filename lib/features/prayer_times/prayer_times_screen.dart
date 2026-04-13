@@ -175,10 +175,10 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen> {
               },
             ),
           ),
-          // Qibla button — bottom-left, aligned with settings FAB bottom
+          // Qibla button — bottom-left, aligned with settings FAB
           Positioned(
             left: 16,
-            bottom: MediaQuery.of(context).padding.bottom + 16,
+            bottom: 16,
             child: QiblaButton(onPressed: () => context.push('/qibla')),
           ),
         ],
