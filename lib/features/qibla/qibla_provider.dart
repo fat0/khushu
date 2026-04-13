@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:flutter_compass/flutter_compass.dart';
+import 'package:flutter_compass_v2/flutter_compass_v2.dart';
 import 'package:flutter_qiblah/flutter_qiblah.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/qibla/qibla_service.dart';

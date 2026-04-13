@@ -1,5 +1,5 @@
 import 'package:adhan/adhan.dart';
-import 'package:flutter_compass/flutter_compass.dart';
+import 'package:flutter_compass_v2/flutter_compass_v2.dart';
 import 'package:flutter_qiblah/flutter_qiblah.dart';
 
 class QiblaService {
