@@ -178,7 +178,7 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen> {
           // Qibla button — bottom-left
           Positioned(
             left: 16,
-            bottom: 16,
+            bottom: 0,
             child: SafeArea(
               child: QiblaButton(onPressed: () => context.push('/qibla')),
             ),
