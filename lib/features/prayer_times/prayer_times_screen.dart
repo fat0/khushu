@@ -175,24 +175,26 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen> {
               },
             ),
           ),
+          // Bottom buttons — aligned with 20px content margins
+          Positioned(
+            left: 20,
+            right: 20,
+            bottom: 20,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                QiblaButton(onPressed: () => context.push('/qibla')),
+                FloatingActionButton.small(
+                  onPressed: () => context.push('/settings'),
+                  backgroundColor: AppColors.sage,
+                  child: const Icon(Icons.settings, color: AppColors.cream, size: 20),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            QiblaButton(onPressed: () => context.push('/qibla')),
-            FloatingActionButton.small(
-              onPressed: () => context.push('/settings'),
-              backgroundColor: AppColors.sage,
-              child: const Icon(Icons.settings, color: AppColors.cream, size: 20),
-            ),
-          ],
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 }
