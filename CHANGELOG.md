@@ -4,6 +4,20 @@ All notable changes to Khushu will be documented in this file.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/). Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [1.2.0] — 2026-04-13
+
+### Added
+- Qibla compass with live magnetometer bearing via flutter_qiblah
+- Dual-arrow compass: red north needle + sage green Qibla arrow with 3D Ka'bah at center
+- Ka'bah icon button on prayer times screen (bottom-left) to launch compass
+- Calibration overlay with figure-8 illustration when sensor accuracy is low
+- Manual calibrate button always available on compass screen
+- Static bearing fallback (degrees + direction) for devices without magnetometer
+- Offline prayer time calculation via adhan-dart (API → offline → error fallback)
+
+### Changed
+- Android compileSdk bumped to 36, minSdk to 23, AGP to 8.9.1
+
 ## [1.1.0] — 2026-04-11
 
 ### Added
