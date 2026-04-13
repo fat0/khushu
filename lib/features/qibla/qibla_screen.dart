@@ -27,21 +27,7 @@ class QiblaScreen extends ConsumerWidget {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.of(context).maybePop(),
         ),
-        title: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text('Qibla Compass', style: theme.textTheme.bodyLarge),
-            if (normalizedBearing != null)
-              Text(
-                '$normalizedBearing° from North',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: isDark
-                      ? AppColors.darkSecondary
-                      : AppColors.lightSecondary,
-                ),
-              ),
-          ],
-        ),
+        title: Text('Qibla Compass', style: theme.textTheme.bodyLarge),
         centerTitle: true,
       ),
       body: Stack(
@@ -64,15 +50,19 @@ class QiblaScreen extends ConsumerWidget {
                   isAligned: state.isAligned,
                 ),
                 const Spacer(),
-                TextButton(
-                  onPressed: () =>
-                      ref.read(qiblaProvider.notifier).showCalibration(),
-                  style: TextButton.styleFrom(
-                    foregroundColor: primaryColor,
+                SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: TextButton(
+                      onPressed: () =>
+                          ref.read(qiblaProvider.notifier).showCalibration(),
+                      style: TextButton.styleFrom(
+                        foregroundColor: primaryColor,
+                      ),
+                      child: const Text('Calibrate'),
+                    ),
                   ),
-                  child: const Text('Calibrate'),
                 ),
-                const SizedBox(height: 32),
               ],
             ),
           if (state.needsCalibration)
