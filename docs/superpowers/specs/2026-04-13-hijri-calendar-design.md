@@ -39,9 +39,10 @@ Add optional Hijri (Islamic) date display to Khushu. Users choose between Gregor
 
 ## Settings Screen
 
-- New "Calendar" section at the bottom (after Notifications)
-- Same tile style as Fiqh selector — two radio options
-- Order: Fiqh, Calculation Method, Location, Notifications, Calendar
+- Reorder existing sections (currently: Fiqh, Calculation Method, Notifications, Location)
+- New order: Fiqh, Calculation Method, Location, Notifications, Calendar
+- New "Calendar" section at the bottom
+- Same tile style as Fiqh selector — two radio options: Gregorian, Hijri
 
 ## Dome Header Changes
 
