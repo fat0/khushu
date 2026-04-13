@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import '../debug_log.dart';
+import '../hijri/hijri_service.dart';
 import '../models/prayer_times.dart';
 
 class AlAdhanApi {
@@ -36,7 +37,21 @@ class AlAdhanApi {
     if (timings == null) {
       throw PrayerTimesException('Prayer times not available for this location');
     }
-    return PrayerTimes.fromAlAdhanJson(timings as Map<String, dynamic>, date);
+
+    String? hijriDate;
+    final hijriJson = data['date']?['hijri'] as Map<String, dynamic>?;
+    if (hijriJson != null) {
+      final parsed = HijriService.fromApiResponse(hijriJson);
+      if (parsed != null) {
+        hijriDate = HijriService.formatHijriDate(parsed);
+      }
+    }
+
+    return PrayerTimes.fromAlAdhanJson(
+      timings as Map<String, dynamic>,
+      date,
+      hijriDate: hijriDate,
+    );
   }
 
   static Future<PrayerTimes> fetchPrayerTimes({

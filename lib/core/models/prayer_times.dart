@@ -26,6 +26,7 @@ class PrayerTimes {
   final String isha;
   final DateTime date;
   final PrayerTimeSource source;
+  final String? hijriDate;
 
   const PrayerTimes({
     required this.fajr,
@@ -37,9 +38,14 @@ class PrayerTimes {
     required this.isha,
     required this.date,
     this.source = PrayerTimeSource.api,
+    this.hijriDate,
   });
 
-  factory PrayerTimes.fromAlAdhanJson(Map<String, dynamic> json, DateTime date) {
+  factory PrayerTimes.fromAlAdhanJson(
+    Map<String, dynamic> json,
+    DateTime date, {
+    String? hijriDate,
+  }) {
     return PrayerTimes(
       fajr: json['Fajr'] as String,
       sunrise: json['Sunrise'] as String,
@@ -48,6 +54,7 @@ class PrayerTimes {
       maghrib: json['Maghrib'] as String,
       isha: json['Isha'] as String,
       date: date,
+      hijriDate: hijriDate,
     );
   }
 
@@ -62,6 +69,7 @@ class PrayerTimes {
       isha: isha,
       date: date,
       source: source,
+      hijriDate: hijriDate,
     );
   }
 
