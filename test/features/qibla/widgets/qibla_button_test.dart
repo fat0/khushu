@@ -4,7 +4,7 @@ import 'package:khushu/features/qibla/widgets/qibla_button.dart';
 
 void main() {
   group('QiblaButton', () {
-    testWidgets('renders a 48x48 circular button', (tester) async {
+    testWidgets('renders a 40x40 circular button', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -30,7 +30,7 @@ void main() {
       expect(pressed, true);
     });
 
-    testWidgets('shows Qibla label text', (tester) async {
+    testWidgets('contains CustomPaint for Ka\'bah icon', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -39,7 +39,7 @@ void main() {
         ),
       );
 
-      expect(find.text('Qibla'), findsOneWidget);
+      expect(find.byType(CustomPaint), findsWidgets);
     });
   });
 }

@@ -9,148 +9,123 @@ class QiblaButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final iconColor = isDark ? AppColors.sage : AppColors.deepGreen;
     final surfaceColor = isDark ? AppColors.darkSurface : AppColors.lightSurface;
     final borderColor = isDark
         ? AppColors.sage.withValues(alpha: 0.25)
         : AppColors.deepGreen.withValues(alpha: 0.25);
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        GestureDetector(
-          onTap: onPressed,
-          child: Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: surfaceColor,
-              border: Border.all(color: borderColor, width: 1.5),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.3),
-                  blurRadius: 6,
-                  offset: const Offset(0, 3),
-                ),
-              ],
+    return GestureDetector(
+      onTap: onPressed,
+      child: Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: surfaceColor,
+          border: Border.all(color: borderColor, width: 1.5),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.3),
+              blurRadius: 6,
+              offset: const Offset(0, 3),
             ),
-            child: Center(
-              child: CustomPaint(
-                size: const Size(28, 28),
-                painter: _KaabahPainter(color: iconColor),
-              ),
-            ),
+          ],
+        ),
+        child: Center(
+          child: CustomPaint(
+            size: const Size(24, 27),
+            painter: _KaabahPainter(isDark: isDark),
           ),
         ),
-        const SizedBox(height: 4),
-        Text(
-          'Qibla',
-          style: TextStyle(
-            fontSize: 10,
-            color: isDark ? AppColors.sage : AppColors.deepGreen,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ],
+      ),
     );
   }
 }
 
 class _KaabahPainter extends CustomPainter {
-  final Color color;
+  final bool isDark;
 
-  _KaabahPainter({required this.color});
+  _KaabahPainter({required this.isDark});
 
-  // ViewBox is 160x160, scaled down to 28x28
-  static const double _vbSize = 160.0;
+  // ViewBox: 130 x 148
+  static const double _vbW = 130.0;
+  static const double _vbH = 148.0;
 
-  Offset _scale(double x, double y, Size size) {
-    return Offset(x / _vbSize * size.width, y / _vbSize * size.height);
+  Offset _s(double x, double y, Size size) {
+    return Offset(x / _vbW * size.width, y / _vbH * size.height);
   }
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.0 * size.width / 28.0
-      ..strokeJoin = StrokeJoin.round
-      ..strokeCap = StrokeCap.round;
-
-    final fillPaint = Paint()
-      ..color = color.withValues(alpha: 0.08)
+    // Arrow
+    final arrowColor = isDark ? AppColors.sage : AppColors.deepGreen;
+    final arrowPaint = Paint()
+      ..color = arrowColor
       ..style = PaintingStyle.fill;
-
-    // Front face fill
-    final frontPath = Path()
-      ..moveTo(_scale(48, 70, size).dx, _scale(48, 70, size).dy)
-      ..lineTo(_scale(48, 120, size).dx, _scale(48, 120, size).dy)
-      ..lineTo(_scale(96, 120, size).dx, _scale(96, 120, size).dy)
-      ..lineTo(_scale(96, 70, size).dx, _scale(96, 70, size).dy)
+    final arrow = Path()
+      ..moveTo(_s(65, 2, size).dx, _s(65, 2, size).dy)
+      ..lineTo(_s(48, 42, size).dx, _s(48, 42, size).dy)
+      ..lineTo(_s(65, 30, size).dx, _s(65, 30, size).dy)
+      ..lineTo(_s(82, 42, size).dx, _s(82, 42, size).dy)
       ..close();
-    canvas.drawPath(frontPath, fillPaint);
+    canvas.drawPath(arrow, arrowPaint);
 
-    // Top face fill
-    final topPath = Path()
-      ..moveTo(_scale(48, 70, size).dx, _scale(48, 70, size).dy)
-      ..lineTo(_scale(72, 50, size).dx, _scale(72, 50, size).dy)
-      ..lineTo(_scale(120, 50, size).dx, _scale(120, 50, size).dy)
-      ..lineTo(_scale(96, 70, size).dx, _scale(96, 70, size).dy)
+    // Top face
+    final topColor = isDark ? const Color(0xFF6B8C66) : const Color(0xFF7DA078);
+    final top = Path()
+      ..moveTo(_s(65, 48, size).dx, _s(65, 48, size).dy)
+      ..lineTo(_s(20, 71, size).dx, _s(20, 71, size).dy)
+      ..lineTo(_s(65, 94, size).dx, _s(65, 94, size).dy)
+      ..lineTo(_s(110, 71, size).dx, _s(110, 71, size).dy)
       ..close();
-    final topFillPaint = Paint()
-      ..color = color.withValues(alpha: 0.15)
-      ..style = PaintingStyle.fill;
-    canvas.drawPath(topPath, topFillPaint);
+    canvas.drawPath(top, Paint()..color = topColor);
 
-    // Right face fill
-    final rightPath = Path()
-      ..moveTo(_scale(96, 70, size).dx, _scale(96, 70, size).dy)
-      ..lineTo(_scale(120, 50, size).dx, _scale(120, 50, size).dy)
-      ..lineTo(_scale(120, 100, size).dx, _scale(120, 100, size).dy)
-      ..lineTo(_scale(96, 120, size).dx, _scale(96, 120, size).dy)
+    // Left face
+    final leftColor = isDark ? AppColors.deepGreen : AppColors.deepGreen;
+    final left = Path()
+      ..moveTo(_s(20, 71, size).dx, _s(20, 71, size).dy)
+      ..lineTo(_s(20, 121, size).dx, _s(20, 121, size).dy)
+      ..lineTo(_s(65, 144, size).dx, _s(65, 144, size).dy)
+      ..lineTo(_s(65, 94, size).dx, _s(65, 94, size).dy)
       ..close();
-    final rightFillPaint = Paint()
-      ..color = color.withValues(alpha: 0.05)
-      ..style = PaintingStyle.fill;
-    canvas.drawPath(rightPath, rightFillPaint);
+    canvas.drawPath(left, Paint()..color = leftColor);
 
-    // Draw front face outline
-    canvas.drawPath(frontPath, paint);
-    // Draw top face outline
-    canvas.drawPath(topPath, paint);
-    // Draw right face outline
-    canvas.drawPath(rightPath, paint);
+    // Right face
+    final rightColor = isDark ? const Color(0xFF2A4228) : const Color(0xFF2E4A2C);
+    final right = Path()
+      ..moveTo(_s(65, 94, size).dx, _s(65, 94, size).dy)
+      ..lineTo(_s(65, 144, size).dx, _s(65, 144, size).dy)
+      ..lineTo(_s(110, 121, size).dx, _s(110, 121, size).dy)
+      ..lineTo(_s(110, 71, size).dx, _s(110, 71, size).dy)
+      ..close();
+    canvas.drawPath(right, Paint()..color = rightColor);
 
-    // Hizam (band) — front
-    canvas.drawLine(
-      _scale(48, 88, size),
-      _scale(96, 88, size),
-      paint,
-    );
-    // Hizam — right face
-    canvas.drawLine(
-      _scale(96, 88, size),
-      _scale(120, 68, size),
-      paint,
-    );
+    // Hizam band — left face
+    final hizamColor = isDark
+        ? AppColors.sand.withValues(alpha: 0.8)
+        : AppColors.sand;
+    final hizamLeft = Path()
+      ..moveTo(_s(20, 88, size).dx, _s(20, 88, size).dy)
+      ..lineTo(_s(65, 111, size).dx, _s(65, 111, size).dy)
+      ..lineTo(_s(65, 102, size).dx, _s(65, 102, size).dy)
+      ..lineTo(_s(20, 79, size).dx, _s(20, 79, size).dy)
+      ..close();
+    canvas.drawPath(hizamLeft, Paint()..color = hizamColor);
 
-    // Door (filled rect on front face)
-    final doorLeft = _scale(65, 100, size);
-    final doorRect = Rect.fromLTWH(
-      doorLeft.dx,
-      doorLeft.dy,
-      14 / _vbSize * size.width,
-      20 / _vbSize * size.height,
-    );
-    final doorFill = Paint()
-      ..color = color.withValues(alpha: 0.35)
-      ..style = PaintingStyle.fill;
-    canvas.drawRect(doorRect, doorFill);
-    canvas.drawRect(doorRect, paint);
+    // Hizam band — right face
+    final hizamRightColor = isDark
+        ? const Color(0xFFC4B998).withValues(alpha: 0.8)
+        : const Color(0xFFC4B998);
+    final hizamRight = Path()
+      ..moveTo(_s(65, 111, size).dx, _s(65, 111, size).dy)
+      ..lineTo(_s(110, 88, size).dx, _s(110, 88, size).dy)
+      ..lineTo(_s(110, 79, size).dx, _s(110, 79, size).dy)
+      ..lineTo(_s(65, 102, size).dx, _s(65, 102, size).dy)
+      ..close();
+    canvas.drawPath(hizamRight, Paint()..color = hizamRightColor);
   }
 
   @override
   bool shouldRepaint(_KaabahPainter oldDelegate) =>
-      oldDelegate.color != color;
+      oldDelegate.isDark != isDark;
 }
