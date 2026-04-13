@@ -175,19 +175,24 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen> {
               },
             ),
           ),
-          // Qibla button — bottom-left, aligned with settings FAB
-          Positioned(
-            left: 16,
-            bottom: 16,
-            child: QiblaButton(onPressed: () => context.push('/qibla')),
-          ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.small(
-        onPressed: () => context.push('/settings'),
-        backgroundColor: AppColors.sage,
-        child: const Icon(Icons.settings, color: AppColors.cream, size: 20),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            QiblaButton(onPressed: () => context.push('/qibla')),
+            FloatingActionButton.small(
+              onPressed: () => context.push('/settings'),
+              backgroundColor: AppColors.sage,
+              child: const Icon(Icons.settings, color: AppColors.cream, size: 20),
+            ),
+          ],
+        ),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 }
