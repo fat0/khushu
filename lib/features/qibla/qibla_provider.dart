@@ -55,19 +55,23 @@ final qiblaProvider =
 );
 
 class QiblaNotifier extends StateNotifier<QiblaState> {
-  final Ref _ref;
+  final Ref? _ref;
   StreamSubscription<QiblahDirection>? _qiblahSub;
   StreamSubscription<CompassEvent?>? _compassSub;
 
-  QiblaNotifier(this._ref) : super(const QiblaState.loading()) {
+  QiblaNotifier(Ref ref)
+      : _ref = ref,
+        super(const QiblaState.loading()) {
     _init();
   }
+
+  QiblaNotifier.test() : _ref = null, super(const QiblaState.loading());
 
   Future<void> _init() async {
     final hasSensor = await QiblaService.hasMagnetometer();
 
     if (!hasSensor) {
-      final settings = _ref.read(settingsProvider);
+      final settings = _ref!.read(settingsProvider);
       final lat = settings.latitude;
       final lng = settings.longitude;
       if (lat != null && lng != null) {
