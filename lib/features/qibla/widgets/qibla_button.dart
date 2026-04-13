@@ -21,12 +21,19 @@ class QiblaButton extends StatelessWidget {
         GestureDetector(
           onTap: onPressed,
           child: Container(
-            width: 48,
-            height: 48,
+            width: 40,
+            height: 40,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: surfaceColor,
               border: Border.all(color: borderColor, width: 1.5),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.3),
+                  blurRadius: 6,
+                  offset: const Offset(0, 3),
+                ),
+              ],
             ),
             child: Center(
               child: CustomPaint(
@@ -74,17 +81,6 @@ class _KaabahPainter extends CustomPainter {
     final fillPaint = Paint()
       ..color = color.withValues(alpha: 0.08)
       ..style = PaintingStyle.fill;
-
-    // Circle border
-    final circlePaint = Paint()
-      ..color = color.withValues(alpha: 0.4)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5 * size.width / 28.0;
-    canvas.drawCircle(
-      _scale(80, 80, size),
-      74 / _vbSize * size.width,
-      circlePaint,
-    );
 
     // Front face fill
     final frontPath = Path()
