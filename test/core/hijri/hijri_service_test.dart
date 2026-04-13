@@ -44,7 +44,7 @@ void main() {
 
     group('formatHijriDate', () {
       test('formats as day monthName year', () {
-        final date = HijriDate(day: 15, monthName: 'Shawwal', year: 1448);
+        const date = HijriDate(day: 15, monthName: 'Shawwal', year: 1448);
         expect(HijriService.formatHijriDate(date), '15 Shawwal 1448');
       });
     });
