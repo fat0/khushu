@@ -63,6 +63,7 @@ class QiblaNotifier extends StateNotifier<QiblaState> {
   final Ref? _ref;
   StreamSubscription<QiblahDirection>? _qiblahSub;
   StreamSubscription<CompassEvent?>? _compassSub;
+  bool _manualCalibration = false;
 
   QiblaNotifier(Ref ref)
       : _ref = ref,
@@ -104,7 +105,7 @@ class QiblaNotifier extends StateNotifier<QiblaState> {
     _compassSub = QiblaService.compassEvents.listen((event) {
       if (event == null) return;
       final accuracy = event.accuracy;
-      if (accuracy != null) {
+      if (accuracy != null && !_manualCalibration) {
         state = QiblaState(
           isLoading: state.isLoading,
           hasMagnetometer: true,
@@ -118,21 +119,25 @@ class QiblaNotifier extends StateNotifier<QiblaState> {
   }
 
   void dismissCalibration() {
+    _manualCalibration = false;
     state = QiblaState(
       isLoading: state.isLoading,
       hasMagnetometer: state.hasMagnetometer,
       qiblaDirection: state.qiblaDirection,
       compassHeading: state.compassHeading,
+      qiblaOffset: state.qiblaOffset,
       needsCalibration: false,
     );
   }
 
   void showCalibration() {
+    _manualCalibration = true;
     state = QiblaState(
       isLoading: state.isLoading,
       hasMagnetometer: state.hasMagnetometer,
       qiblaDirection: state.qiblaDirection,
       compassHeading: state.compassHeading,
+      qiblaOffset: state.qiblaOffset,
       needsCalibration: true,
     );
   }
