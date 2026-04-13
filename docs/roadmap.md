@@ -25,6 +25,15 @@
 - CI/CD: GitHub Actions tests, release workflow, Fastlane
 - Security: Dependabot, gitleaks, Trivy, CodeQL
 
+### v1.2.0 — April 2026
+- Qibla compass with live magnetometer bearing (flutter_qiblah)
+- Dual-arrow compass: red north needle + sage green Qibla arrow with 3D Ka'bah at center
+- Ka'bah icon button on prayer times screen
+- Calibration overlay with figure-8 illustration
+- Static bearing fallback for devices without magnetometer
+- Offline prayer time calculation via adhan-dart (API → offline → error fallback)
+- Android SDK bumps (compileSdk 36, minSdk 23, AGP 8.9.1)
+
 ## In Progress
 - Play Store: 12 testers needed for 14 days → production access
 - Fastlane auto-deploy to Play Store (blocked by draft app status)
@@ -32,11 +41,8 @@
 ## Next Up
 1. Hijri calendar — Islamic date display
 2. Adhan audio improvements — trim dua from recordings, add Al Aqsa/Makkah options (licensing needed), user selection
-3. Offline prayer calculation (adhan-dart)
-4. Qibla compass
-5. AlAdhan API rate limiting — handle gracefully ([rate limit info](https://community.islamic.network/knowledgebase/2-is-there-a-rate-limit-on-the-apis))
-6. Multi-language support (Arabic, English, Urdu, Turkish, French)
-7. In-app donations
+3. Multi-language support (Arabic, English, Urdu, Turkish, French)
+4. In-app donations
 
 ## Design Decisions
 - **Framework:** Flutter (Dart) — cross-platform Android & iOS
