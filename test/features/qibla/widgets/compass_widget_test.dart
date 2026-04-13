@@ -11,6 +11,7 @@ void main() {
             body: CompassWidget(
               qiblaDirection: 58.2,
               compassHeading: 142.0,
+              qiblaOffset: 56.4,
               isAligned: false,
             ),
           ),
@@ -31,13 +32,14 @@ void main() {
             body: CompassWidget(
               qiblaDirection: 58.2,
               compassHeading: 142.0,
+              qiblaOffset: 56.4,
               isAligned: false,
             ),
           ),
         ),
       );
 
-      expect(find.textContaining('58.2'), findsOneWidget);
+      expect(find.textContaining('56.4'), findsOneWidget);
     });
   });
 }

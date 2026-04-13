@@ -34,11 +34,11 @@ void main() {
       expect(state.isAligned, false);
     });
 
-    test('isAligned is true when qibla and heading within 5 degrees', () {
+    test('isAligned is true when qibla screen angle is near 0', () {
       const state = QiblaState(
         isLoading: false,
         hasMagnetometer: true,
-        qiblaDirection: 58.2,
+        qiblaDirection: 3.0, // near 0 = phone pointing at Qibla
         compassHeading: 56.0,
         needsCalibration: false,
       );

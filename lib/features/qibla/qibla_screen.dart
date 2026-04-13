@@ -17,13 +17,31 @@ class QiblaScreen extends ConsumerWidget {
     final primaryColor =
         isDark ? AppColors.darkPrimary : AppColors.lightPrimary;
 
+    final normalizedBearing = state.qiblaOffset != null
+        ? (state.qiblaOffset! % 360).toStringAsFixed(1)
+        : null;
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.of(context).maybePop(),
         ),
-        title: Text('Qibla Compass', style: theme.textTheme.bodyLarge),
+        title: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('Qibla Compass', style: theme.textTheme.bodyLarge),
+            if (normalizedBearing != null)
+              Text(
+                '$normalizedBearing° from North',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: isDark
+                      ? AppColors.darkSecondary
+                      : AppColors.lightSecondary,
+                ),
+              ),
+          ],
+        ),
         centerTitle: true,
       ),
       body: Stack(
@@ -42,6 +60,7 @@ class QiblaScreen extends ConsumerWidget {
                 CompassWidget(
                   qiblaDirection: state.qiblaDirection ?? 0,
                   compassHeading: state.compassHeading ?? 0,
+                  qiblaOffset: state.qiblaOffset ?? 0,
                   isAligned: state.isAligned,
                 ),
                 const Spacer(),

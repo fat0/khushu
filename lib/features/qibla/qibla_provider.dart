@@ -8,8 +8,9 @@ import '../settings/settings_provider.dart';
 class QiblaState {
   final bool isLoading;
   final bool hasMagnetometer;
-  final double? qiblaDirection;
-  final double? compassHeading;
+  final double? qiblaDirection;  // screen-relative Qibla angle (already adjusted)
+  final double? compassHeading;  // raw compass heading
+  final double? qiblaOffset;    // fixed bearing from North (for display)
   final double? staticBearing;
   final String? compassDirection;
   final bool needsCalibration;
@@ -19,6 +20,7 @@ class QiblaState {
     this.hasMagnetometer = true,
     this.qiblaDirection,
     this.compassHeading,
+    this.qiblaOffset,
     this.staticBearing,
     this.compassDirection,
     this.needsCalibration = false,
@@ -29,6 +31,7 @@ class QiblaState {
         hasMagnetometer = true,
         qiblaDirection = null,
         compassHeading = null,
+        qiblaOffset = null,
         staticBearing = null,
         compassDirection = null,
         needsCalibration = false;
@@ -40,12 +43,14 @@ class QiblaState {
         hasMagnetometer = false,
         qiblaDirection = null,
         compassHeading = null,
+        qiblaOffset = null,
         needsCalibration = false;
 
+  /// Aligned when the Qibla arrow points straight up (near 0° on screen).
   bool get isAligned {
-    if (qiblaDirection == null || compassHeading == null) return false;
-    final diff = (qiblaDirection! - compassHeading!).abs() % 360;
-    return diff <= 5 || diff >= 355;
+    if (qiblaDirection == null) return false;
+    final screenAngle = qiblaDirection! % 360;
+    return screenAngle <= 5 || screenAngle >= 355;
   }
 }
 
@@ -91,6 +96,7 @@ class QiblaNotifier extends StateNotifier<QiblaState> {
         hasMagnetometer: true,
         qiblaDirection: event.qiblah,
         compassHeading: event.direction,
+        qiblaOffset: event.offset,
         needsCalibration: state.needsCalibration,
       );
     });
@@ -104,6 +110,7 @@ class QiblaNotifier extends StateNotifier<QiblaState> {
           hasMagnetometer: true,
           qiblaDirection: state.qiblaDirection,
           compassHeading: state.compassHeading,
+          qiblaOffset: state.qiblaOffset,
           needsCalibration: accuracy < 15,
         );
       }
