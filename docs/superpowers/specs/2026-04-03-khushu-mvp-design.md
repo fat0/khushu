@@ -153,19 +153,16 @@ lib/
 
 ## Risks
 
-- **AlAdhan API downtime:** Mitigated by daily caching + offline fallback via adhan-dart (added in v1.2.0).
+- **AlAdhan API downtime:** Mitigated by daily caching — app only needs API once per day. Offline calculation (adhan-dart) is on the roadmap.
 - **Jafari accuracy:** AlAdhan API supports two Shia methods — Qum (method 0) and Tehran (method 7). Tehran available as override in settings for users who prefer it.
 - **GPS permission denied or fails:** Falls back to dialog prompting manual city entry. App remains fully functional.
 
-## Completed (Post-MVP)
+## Out of Scope (Future Roadmap)
 
-1. ~~Adhan alerts with audio~~ — v1.1.0
-2. ~~Qibla compass~~ — v1.2.0
-3. ~~Offline prayer time calculation (adhan-dart)~~ — v1.2.0
-
-## Future Roadmap
-
-1. Hijri calendar
-2. Multi-language support (Arabic, English, Urdu, Turkish, French)
-3. Optional in-app donations
-4. Dual source mode (adhan-dart + AlAdhan cross-validation)
+1. Adhan alerts with audio
+2. Qibla compass
+3. Hijri calendar
+4. Multi-language support (Arabic, English, Urdu, Turkish, French)
+5. Optional in-app donations
+6. Offline prayer time calculation (adhan-dart)
+7. Dual source mode (adhan-dart + AlAdhan cross-validation)
